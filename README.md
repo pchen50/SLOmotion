@@ -2,7 +2,7 @@
 
 ## Contributors
 - Julianne Legados [jplegado@calpoly.edu]
-- Rachana Raju [email]
+- Rachana Raju [rraju03@calpoly.edu]
 - Noah Scott [email]
 - Philip Chen [email]
 
