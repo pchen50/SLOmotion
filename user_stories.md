@@ -1,6 +1,3 @@
-## User Stories 
+##  User Stories and Exceptions
 
-
-
-## Exceptions
 
