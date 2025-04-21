@@ -1,5 +1,5 @@
-# Api specifications
-
+## API specifications & 3 Distinct Example Flows
+---
 1. **POST /users/login/{user_id}**  
    a. Description: Validate a user and start the session  
    b. Body:
