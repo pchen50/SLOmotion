@@ -192,20 +192,23 @@ Alice finishes watching *Barbie* and updates its status in her watchlist. She th
   }
   ```
 - Server response:
- ``` json
-{
-  “movie_id”: “tt1517268”,
-  “Title”: “Gladiator”,
-  “rating”: “9.8”,
-  “genre”: “action”
-},
-{
-  “movie_id”: “tt1417298”,
-  “Title”: “Good Will Hunting”,
-  “rating”: “9.7”,
-  “genre”: “drama”,
-
-}
+ ```json
+ [
+   {
+      "movie_id": "tt1517268",
+      "title": "Gladiator",
+      "status": "watched",
+      "rating": "9.8",
+      "genre": "action"
+    },
+    {
+      "movie_id": "tt1417298",
+      "title": "Good Will Hunting",
+      "status": "watched",
+      "rating": "9.7",
+      "genre": "drama"
+    }
+ ]
 ``` 
 - She then calls `GET /recommended_movies/456219` to receive personalized recommendations.
 
@@ -216,6 +219,8 @@ Eve gets a recommendation to watch *A Minecraft Movie*, but later changes her mi
 - She adds the movie using `POST /watchlist/376541/tt3566834`
   ```json
   {
+    "user_id": "376541",
+    "movie_id": "tt3566834",
     "status": "want to watch"
   }
   ```
