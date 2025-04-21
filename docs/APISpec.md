@@ -191,6 +191,22 @@ Alice finishes watching *Barbie* and updates its status in her watchlist. She th
     "status": "watched"
   }
   ```
+- Server response:
+ ``` json
+{
+  “movie_id”: “tt1517268”,
+  “Title”: “Gladiator”,
+  “rating”: “9.8”,
+  “genre”: “action”
+},
+{
+  “movie_id”: “tt1417298”,
+  “Title”: “Good Will Hunting”,
+  “rating”: “9.7”,
+  “genre”: “drama”,
+
+}
+``` 
 - She then calls `GET /recommended_movies/456219` to receive personalized recommendations.
 
 ## 3. Watchlist User Adds and Removes Movies Example Flow
