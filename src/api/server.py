@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 # from src.api import carts, catalog, bottler, barrels, admin, info, inventory
 from starlette.middleware.cors import CORSMiddleware
 
@@ -42,6 +43,7 @@ app.add_middleware(
     allow_methods=["GET", "OPTIONS"],
     allow_headers=["*"],
 )
+
 
 @app.get("/")
 async def root():
