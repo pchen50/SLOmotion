@@ -1,8 +1,10 @@
 from logging.config import fileConfig
-import os
-
+import sys, os
 from sqlalchemy import engine_from_config, pool
 from alembic import context
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from src.models import Base
 
 # Alembic Config object
 config = context.config
@@ -11,7 +13,7 @@ config = context.config
 config.set_main_option(
     "sqlalchemy.url",
     os.getenv(
-        "POSTGRES_URI", "postgresql+psycopg://myuser:mypassword@localhost/mydatabase"
+        "POSTGRES_URI", "postgresql+psycopg2://myuser:mypassword@localhost/mydatabase"
     ),
 )
 
@@ -21,7 +23,7 @@ if config.config_file_name is not None:
 
 # Import your metadata (for `--autogenerate`)
 # from app.db import Base
-target_metadata = None  # or Base.metadata
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
