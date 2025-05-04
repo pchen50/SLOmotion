@@ -27,11 +27,44 @@ class MovieRating(BaseModel):
     status: str
 
 @router.get("/{user_id}", response_model=List[WatchlistMovie])
-def create_user(user_id: int) -> List[WatchlistMovie]: # return list of rated movies
+def get_rated_movies(user_id: int) -> List[WatchlistMovie]: # return list of rated movies
     pass 
     # get their watchlist id from watchlists?
+    with db.engine.begin() as connection:
+        row = connection.execute(
+            sqlalchemy.text(
+                    """ 
+                        SELECT id, public
+                        FROM watchlists
+                        WHERE user_id = :user_id
+                    """
+            ),
+            [{"user_id": user_id}]
+        ).one()
+        if row.public == False:
+            return []
+        watchlist_id = row.id
     # Then from that get all the movie_rating ids associated with watchlist id
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                    SELECT watchlist_id, movies.id as movie_id, movies.name as name
+                    FROM watchlist_movie
+                    JOIN movie_ratings on watchlist_movie.movie_rating_id = movie_ratings.id
+                    JOIN movies on movie_ratings.movie_id = movies.id
+                    WHERE watchlist_id = :watchlist_id
+                """
+            ),
+            [
+                {"watchlist_id": watchlist_id}
+            ]
+        ).tuples()
     # for all movie rating ids return the movie_rating, movie_ids, and their names
+        watchlist_movies = []
+        for movie in result:
+            watchlist_movies.append(WatchlistMovie(watchlist_id=movie.watchlist_id, movie_id=movie.movie_id, name=movie.name))
+        return watchlist_movies
+
 
 @router.get("/{user_id}/{movie_id}", response_model=MovieRating)
 def get_movie_rating(user_id: int, movie_id:int) -> MovieRating: # return a movie rating
