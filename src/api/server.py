@@ -1,36 +1,24 @@
 from fastapi import FastAPI
-
-# from src.api import carts, catalog, bottler, barrels, admin, info, inventory
+from src.api import user, watchlist
 from starlette.middleware.cors import CORSMiddleware
 
 description = """
-Central Coast Cauldrons is the premier ecommerce site for all your alchemical desires.
+SLOmotion allows you to track movies.
 """
 tags_metadata = [
-    {"name": "cart", "description": "Place potion orders."},
-    {"name": "catalog", "description": "View the available potions."},
-    {"name": "bottler", "description": "Bottle potions from the raw magical elixir."},
-    {
-        "name": "barrels",
-        "description": "Buy barrels of raw magical elixir for making potions.",
-    },
-    {"name": "admin", "description": "Where you reset the game state."},
-    {"name": "info", "description": "Get updates on time"},
-    {
-        "name": "inventory",
-        "description": "Get the current inventory of shop and buying capacity.",
-    },
+    {"name": "user", "description": "Create a user account"},
+    {"name": "watchlist", "description": "View and comment on watchlists."},
 ]
 
 app = FastAPI(
-    title="Central Coast Cauldrons",
+    title="SLOmotion",
     description=description,
     version="0.0.1",
     terms_of_service="http://example.com/terms/",
-    contact={
-        "name": "Lucas Pierce",
-        "email": "lupierce@calpoly.edu",
-    },
+    # contact={
+    #     "name": "Lucas Pierce",
+    #     "email": "lupierce@calpoly.edu",
+    # },
     openapi_tags=tags_metadata,
 )
 
@@ -44,6 +32,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(user.router)
+app.include_router(watchlist.router)
 
 @app.get("/")
 async def root():
