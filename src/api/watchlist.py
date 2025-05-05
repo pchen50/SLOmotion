@@ -28,7 +28,6 @@ class MovieRating(BaseModel):
 
 @router.get("/{user_id}", response_model=List[WatchlistMovie])
 def get_rated_movies(user_id: int) -> List[WatchlistMovie]: # return list of rated movies
-    pass 
     # get their watchlist id from watchlists?
     with db.engine.begin() as connection:
         row = connection.execute(
