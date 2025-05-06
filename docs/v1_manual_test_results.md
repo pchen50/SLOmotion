@@ -49,7 +49,7 @@ Retrieves the rating, notes, and status a user gave to a specific movie.
 | `user_id`  | int    | The ID of the user who rated the movie |
 | `movie_id` | int    | The ID of the movie to retrieve rating for |
 
-### 📤 Response: `200 OK`
+### Response: `200 OK`
 
 Returns a JSON object containing the user's rating, notes, and viewing status for the specified movie.
 
