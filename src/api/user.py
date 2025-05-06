@@ -14,19 +14,22 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
+
 class Customer(BaseModel):
     customer_name: str
+
 
 class UserCreateResponse(BaseModel):
     user_id: int
 
+
 @router.post("/", response_model=UserCreateResponse)
 def create_user(new_cart: Customer):
-     # probably just insert into users and return an id
+    # probably just insert into users and return an id
     # maybe also insert into watchlist? to create a user's watchlist and just default set status to public
 
     try:
-        with db.engine.begin() as connection:         #creates a new user
+        with db.engine.begin() as connection:  # creates a new user
             result = connection.execute(
                 sqlalchemy.text(
                     """
@@ -41,9 +44,9 @@ def create_user(new_cart: Customer):
 
             if user_id is None:
                 raise HTTPException(status_code=500, detail="Failed to create user")
-            
-            #creates a new watchlist for the user
-            connection.execute(     
+
+            # creates a new watchlist for the user
+            connection.execute(
                 sqlalchemy.text(
                     """
                         INSERT INTO watchlists (user_id, public)
@@ -54,6 +57,6 @@ def create_user(new_cart: Customer):
             )
 
             return UserCreateResponse(user_id=int(user_id))
-        
+
     except sqlalchemy.exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))

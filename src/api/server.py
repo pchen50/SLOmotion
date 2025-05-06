@@ -35,6 +35,7 @@ app.add_middleware(
 app.include_router(user.router)
 app.include_router(watchlist.router)
 
+
 @app.get("/")
 async def root():
     return {"message": "Shop is open for business!"}
