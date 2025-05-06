@@ -39,9 +39,9 @@ Bob just finished watching *Good Will Hunting* for a second time and had some th
 ## Get Movie Rating by User
 
 ### `GET /watchlist/{user_id}/{movie_id}`
-Bob wants to check the rating he gave to *Good Will Hunting*.
+Alice wants to check the rating she gave to *Everything Everywhere All At Once*.
 
-- Bob knows:
+- Alice knows:
   - `user_id = 1`
   - `movie_id = 1`
 
@@ -57,7 +57,7 @@ Bob wants to check the rating he gave to *Good Will Hunting*.
   -H 'accept: application/json' \
   -H 'access_token: brat'
 
-- The server returns his review, rating, and status.
+- The server returns her review, rating, and status.
   ```json
   {
   "user_id": 1,
