@@ -35,3 +35,29 @@ Bob just finished watching *Good Will Hunting* for a second time and had some th
     "name": "Good Will Hunting"
   }
 ]
+
+## Get Movie Rating by User
+
+### `GET /watchlist/{user_id}/{movie_id}`
+
+Retrieves the rating, notes, and status a user gave to a specific movie.
+
+### Path Parameters
+
+| Name       | Type   | Description                          |
+|------------|--------|--------------------------------------|
+| `user_id`  | int    | The ID of the user who rated the movie |
+| `movie_id` | int    | The ID of the movie to retrieve rating for |
+
+### 📤 Response: `200 OK`
+
+Returns a JSON object containing the user's rating, notes, and viewing status for the specified movie.
+
+```json
+{
+  "user_id": 1,
+  "movie_id": 1,
+  "notes": "Amazing cinematography",
+  "rating": 5,
+  "status": "watched"
+}
