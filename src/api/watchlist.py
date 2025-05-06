@@ -1,11 +1,9 @@
-from dataclasses import dataclass
 from fastapi import APIRouter, Depends, status, HTTPException
 from pydantic import BaseModel
 from typing import List
 import sqlalchemy
 from src.api import auth
 from src import database as db
-from sqlalchemy import exc
 
 router = APIRouter(
     prefix="/watchlist",
@@ -44,7 +42,7 @@ def get_rated_movies(
             ),
             [{"user_id": user_id}],
         ).one()
-        if row.public == False:
+        if not row.public:
             return []
         watchlist_id = row.id
         # Then from that get all the movie_rating ids associated with watchlist id

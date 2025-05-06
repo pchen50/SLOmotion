@@ -1,12 +1,8 @@
-from dataclasses import dataclass
-from fastapi import APIRouter, Depends, status, HTTPException
-from pydantic import BaseModel, Field, field_validator
-from typing import List
-import random
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 import sqlalchemy
 from src.api import auth
 from src import database as db
-from sqlalchemy import exc
 
 router = APIRouter(
     prefix="/user",
