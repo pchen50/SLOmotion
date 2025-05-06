@@ -47,8 +47,15 @@ Bob wants to check the rating he gave to *Good Will Hunting*.
 
 - He sends a request to:
 ```bash
-GET /watchlist/1/1
+[GET /watchlist/1/1](http://127.0.0.1:3000/watchlist/1/1)
 ```
+
+## Testing results
+- Bob calls ():
+  curl -X 'GET' \
+  'http://127.0.0.1:3000/watchlist/1/1' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
 
 - The server returns his review, rating, and status.
   ```json
