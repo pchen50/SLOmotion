@@ -39,25 +39,23 @@ Bob just finished watching *Good Will Hunting* for a second time and had some th
 ## Get Movie Rating by User
 
 ### `GET /watchlist/{user_id}/{movie_id}`
+Bob wants to reflect on his past reviews and looks up the rating he gave Good Will Hunting.
 
-Retrieves the rating, notes, and status a user gave to a specific movie.
-
-### Path Parameters
-
-| Name       | Type   | Description                          |
-|------------|--------|--------------------------------------|
-| `user_id`  | int    | The ID of the user who rated the movie |
-| `movie_id` | int    | The ID of the movie to retrieve rating for |
-
-### Response: `200 OK`
-
-Returns a JSON object containing the user's rating, notes, and viewing status for the specified movie.
-
-```json
-{
+- Bob knows his user ID is 1.
+- He remembers the `movie_id` for *Good Will Hunting* is `1`.
+- He sends a request to:
+```bash
+GET /watchlist/1/1
+```
+- The server returns his review, rating, and status.
+  ```json
+  {
   "user_id": 1,
   "movie_id": 1,
-  "notes": "Amazing cinematography",
+  "notes": "Amazing cinematography.",
   "rating": 5,
   "status": "watched"
-}
+  }
+  ```
+  
+
