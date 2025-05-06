@@ -39,14 +39,17 @@ Bob just finished watching *Good Will Hunting* for a second time and had some th
 ## Get Movie Rating by User
 
 ### `GET /watchlist/{user_id}/{movie_id}`
-Bob wants to reflect on his past reviews and looks up the rating he gave Good Will Hunting.
+Bob wants to check the rating he gave to *Good Will Hunting*.
 
-- Bob knows his user ID is 1.
-- He remembers the `movie_id` for *Good Will Hunting* is `1`.
+- Bob knows:
+  - `user_id = 1`
+  - `movie_id = 1`
+
 - He sends a request to:
 ```bash
 GET /watchlist/1/1
 ```
+
 - The server returns his review, rating, and status.
   ```json
   {
@@ -55,6 +58,13 @@ GET /watchlist/1/1
   "notes": "Amazing cinematography.",
   "rating": 5,
   "status": "watched"
+  }
+  ```
+
+- If the input is invalid or missing, the server responds with:
+  ```json
+  {
+    "detail": "Movie rating not found for this user."
   }
   ```
   
