@@ -26,6 +26,12 @@ class MovieRating(BaseModel):
     rating: int
     status: str
 
+class WatchedMovie(BaseModel):
+    movie_id: int
+    title: str
+    status: str
+    rating: int
+    genre: str
 
 @router.get("/{user_id}", response_model=List[WatchlistMovie])
 def get_watchlist_movies(
@@ -100,13 +106,13 @@ def get_movie_rating(
             user_id=result.user_id,
             notes=result.notes,
             rating=result.rating,
-            status=result.status,
+            status=result.status
         )
 
 class CommentInput(BaseModel):
     comment_text: str
 
-@router.post("/watchlist/{user_id}/{movie_id}/{user2_id}/comment",status_code=status.HTTP_204_NO_CONTENT,)
+@router.post("/{user_id}/{movie_id}/{user2_id}/comment",status_code=status.HTTP_204_NO_CONTENT)
 def post_comment_on_movie_rating(user_id: int, movie_id: int, user2_id: int, comment: CommentInput):
     with db.engine.begin() as connection:
         rating = connection.execute(sqlalchemy.text(
@@ -127,3 +133,22 @@ def post_comment_on_movie_rating(user_id: int, movie_id: int, user2_id: int, com
             VALUES (:commenter_user_id, :user_id, :movie_id, :comment_text)
             """
         ), {"commenter_user_id": user2_id, "user_id": user_id, "movie_id": movie_id, "comment_text": comment.comment_text})
+
+
+@router.patch("/{user_id}/{movie_id}",status_code=status.HTTP_200_OK)
+def update_watchlist_movie_entry(user_id: int, movie_id: int):
+    pass
+
+@router.get("/{user_id}/watched",response_model=List[WatchedMovie])
+def get_users_watched(user_id:int) -> List[WatchedMovie]:
+    pass
+
+@router.post("/{user_id}/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
+def post_movie_onto_watchlist(user_id:int):
+    pass
+    # posts in watchlist movie and movie ratings but in movie ratings it won't have rating or notes?
+
+@router.delete("/{user_id}/{movie_id}", status_code=status.HTTP_200_OK)
+def delete_users_movie_entry(user_id: int, movie_id: int):
+    # delete from movie ratings, watchlist movies, and any comments on it
+    pass
