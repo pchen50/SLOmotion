@@ -78,4 +78,27 @@ Alice wants to check the rating she gave to *Everything Everywhere All At Once*.
   }
   ```
   
-
+## Comment on Another User's Movie Rating
+### 'POST /watchlist/{user_id}/{movie_id}/{user2_id}/comment'
+Bob wants to leave a comment on Joe's movie review of _Good Will Hunting_
+- Bob's user_id = 1, Joe's user_id = 3, and the movie_id of _Good Will Hunting_ is 2:
+- Bob calls: curl -X 'POST' \
+  'http://127.0.0.1:3000/watchlist/3/2/1/comment' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "comment_text": "I agree with your rating! However, I feel like I connected more with Chuckie."
+  }'
+- The server responds with confirmation.
+  ```json
+  {
+  "message": "Comment added."
+  }
+  ```
+- If the movie rating does not exist:
+  ```json
+  {
+    "detail": "Movie rating not found for this user."
+  }
+  ```
