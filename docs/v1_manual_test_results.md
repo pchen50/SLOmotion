@@ -17,6 +17,7 @@ Bob just finished watching *Good Will Hunting* for a second time and had some th
   { "message": "Comment added." }
   ```
 ## Testing results
+## Get a user's watchlist
 - Bob calls (Joe's id is 3):
   curl -X 'GET' \
   'https://slomotion.onrender.com/watchlist/3' \
@@ -27,12 +28,14 @@ Bob just finished watching *Good Will Hunting* for a second time and had some th
   {
     "watchlist_id": 3,
     "movie_id": 3,
-    "name": "Minecraft"
+    "name": "Minecraft",
+    "status": "watched"
   },
   {
     "watchlist_id": 3,
     "movie_id": 1,
-    "name": "Good Will Hunting"
+    "name": "Good Will Hunting",
+    "status": "watched"
   }
 ]
 
