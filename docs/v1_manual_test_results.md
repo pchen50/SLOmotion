@@ -79,7 +79,7 @@ Alice wants to check the rating she gave to *Everything Everywhere All At Once*.
   ```
   
 ## Comment on Another User's Movie Rating
-## 'POST /watchlist/{user_id}/{movie_id}/{user2_id}/comment'
+### 'POST /watchlist/{user_id}/{movie_id}/{user2_id}/comment'
 Bob wants to leave a comment on Joe's movie review of _Good Will Hunting_
 - Bob's user_id = 1, Joe's user_id = 3, and the movie_id of _Good Will Hunting_ is 2:
 - Bob calls: curl -X 'POST' \
