@@ -101,11 +101,27 @@ def get_movie_rating(
             status=result.status,
         )
 
+class CommentInput(BaseModel):
+    comment_text: str
 
-@router.post(
-    "/watchlist/{user_id}/{movie_id}/{user2_id}/comment",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
-def post_comment_on_movie_rating(user_id: int, movie_id: int, user2_id: int):
-    pass
-    # update into comments table
+@router.post("/watchlist/{user_id}/{movie_id}/{user2_id}/comment",status_code=status.HTTP_204_NO_CONTENT,)
+def post_comment_on_movie_rating(user_id: int, movie_id: int, user2_id: int, comment: CommentInput):
+    with db.engine.begin() as connection:
+        rating = connection.execute(sqlalchemy.text(
+            """
+            SELECT 1
+            FROM movie_ratings
+            WHERE user_id = :user_id AND movie_id = :movie_id
+            """
+        ), {"user_id": user_id, "movie_id": movie_id}).one_or_none()
+
+        if rating is None:
+            raise HTTPException( status_code=status.HTTP_404_NOT_FOUND, detail="Movie or user does not exist.",)
+
+        # insert comment
+        connection.execute(sqlalchemy.text(
+            """
+            INSERT INTO comments (commenter_user_id, user_id, movie_id, comment_text)
+            VALUES (:commenter_user_id, :user_id, :movie_id, :comment_text)
+            """
+        ), {"commenter_user_id": user2_id, "user_id": user_id, "movie_id": movie_id, "comment_text": comment.comment_text})
