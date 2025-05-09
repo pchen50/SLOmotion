@@ -16,7 +16,7 @@ Bob just finished watching *Good Will Hunting* for a second time and had some th
   ```json
   { "message": "Comment added." }
   ```
-## Testing results
+## Get movies on user's watchlist
 ### `GET /watchlist/{user_id}`
 Bob wants to see Joe's watchlist and knows Joe's user_id is 3
 - Bob calls (Joe's id is 3):
@@ -35,7 +35,7 @@ Bob wants to see Joe's watchlist and knows Joe's user_id is 3
   },
   {
     "watchlist_id": 3,
-    "movie_id": 1,
+    "movie_id": 2,
     "name": "Good Will Hunting",
     "status": "watched"
   }
@@ -45,29 +45,29 @@ Bob wants to see Joe's watchlist and knows Joe's user_id is 3
 ## Get Movie Rating by User
 
 ### `GET /watchlist/{user_id}/{movie_id}`
-Alice wants to check the rating she gave to *Everything Everywhere All At Once*.
+Bob wants to check the rating Joe gave to *Good Will Hunting*.
 
-- Alice knows:
-  - `user_id = 1`
-  - `movie_id = 1`
+- Bob knows:
+  - `user_id = 3`
+  - `movie_id = 2`
 
 - He sends a request to:
 ```bash
-[GET /watchlist/1/1](http://127.0.0.1:3000/watchlist/1/1)
+[GET /watchlist/3/2](http://127.0.0.1:3000/watchlist/3/2)
 ```
 
 ## Testing results
 - Bob calls ():
   curl -X 'GET' \
-  'http://127.0.0.1:3000/watchlist/1/1' \
+  'http://127.0.0.1:3000/watchlist/3/2' \
   -H 'accept: application/json' \
   -H 'access_token: brat'
 
-- The server returns her review, rating, and status.
+- The server returns Joe's review, rating, and status.
   ```json
   {
-  "user_id": 1,
-  "movie_id": 1,
+  "user_id": 3,
+  "movie_id": 2,
   "notes": "Amazing cinematography.",
   "rating": 5,
   "status": "watched"
