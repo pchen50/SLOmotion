@@ -17,19 +17,21 @@ Bob just finished watching *Good Will Hunting* for a second time and had some th
   { "message": "Comment added." }
   ```
 ## Testing results
-## Get a user's watchlist
+### `GET /watchlist/{user_id}`
+Bob wants to see Joe's watchlist and knows Joe's user_id is 3
 - Bob calls (Joe's id is 3):
   curl -X 'GET' \
   'https://slomotion.onrender.com/watchlist/3' \
   -H 'accept: application/json' \
   -H 'access_token: SLOmotion44'
-- what's returned is
+- The server responds with the list of movies on Joe's watchlist
+```json
   [
   {
     "watchlist_id": 3,
     "movie_id": 3,
     "name": "Minecraft",
-    "status": "watched"
+    "status": "want to watch"
   },
   {
     "watchlist_id": 3,
@@ -38,6 +40,7 @@ Bob just finished watching *Good Will Hunting* for a second time and had some th
     "status": "watched"
   }
 ]
+```
 
 ## Get Movie Rating by User
 
