@@ -33,6 +33,51 @@ class WatchedMovie(BaseModel):
     rating: int
     genre: str
 
+@router.get("/{user_id}/watched", response_model=List[WatchedMovie])
+def get_watched(user_id: int) -> List[WatchedMovie]:
+    print(user_id)
+    with db.engine.begin() as connection:
+        row = connection.execute(
+            sqlalchemy.text(
+                """ 
+                    SELECT id, public
+                    FROM watchlists
+                    WHERE user_id = :user_id
+                """
+            ),
+            [{"user_id": user_id}],
+        ).one()
+        watchlist_id = row.id
+        print(row)
+        # Then from that get all the movie_rating ids associated with watchlist id
+        print(watchlist_id)
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                    SELECT watchlist_id, movies.id as movie_id, movies.name as name, movie_ratings.status as status, movie_ratings.rating as rating, movies.genre as genre
+                    FROM watchlist_movie
+                    JOIN movie_ratings on watchlist_movie.movie_rating_id = movie_ratings.id
+                    JOIN movies on movie_ratings.movie_id = movies.id
+                    WHERE watchlist_id = :watchlist_id and status = 'watched'
+                """
+            ),
+            [{"watchlist_id": watchlist_id}],
+        ).tuples()
+        #for all movie rating ids return the movie_rating, movie_ids, and their names
+        watched_movies = []
+        for movie in result:
+            print(movie)
+            watched_movies.append(
+                WatchedMovie(
+                    movie_id=movie.movie_id,
+                    title = movie.name,
+                    status = movie.status,
+                    rating = movie.rating,
+                    genre = movie.genre
+                )
+            )
+        return watched_movies
+
 @router.get("/{user_id}", response_model=List[WatchlistMovie])
 def get_watchlist_movies(
     user_id: int,
@@ -42,15 +87,13 @@ def get_watchlist_movies(
         row = connection.execute(
             sqlalchemy.text(
                 """ 
-                        SELECT id, public
-                        FROM watchlists
-                        WHERE user_id = :user_id
-                    """
+                    SELECT id, public
+                    FROM watchlists
+                    WHERE user_id = :user_id
+                """
             ),
             [{"user_id": user_id}],
         ).one()
-        if not row.public:
-            return []
         watchlist_id = row.id
         # Then from that get all the movie_rating ids associated with watchlist id
         result = connection.execute(
@@ -139,9 +182,6 @@ def post_comment_on_movie_rating(user_id: int, movie_id: int, user2_id: int, com
 def update_watchlist_movie_entry(user_id: int, movie_id: int):
     pass
 
-@router.get("/{user_id}/watched",response_model=List[WatchedMovie])
-def get_users_watched(user_id:int) -> List[WatchedMovie]:
-    pass
 
 @router.post("/{user_id}/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
 def post_movie_onto_watchlist(user_id:int):
