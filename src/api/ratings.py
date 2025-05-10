@@ -7,7 +7,7 @@ from src import database as db
 
 router = APIRouter(
     prefix="/ratings",
-    tags=["watchlist"],
+    tags=["ratings"],
     dependencies=[Depends(auth.get_api_key)],
 )
 

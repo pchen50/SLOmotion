@@ -8,6 +8,8 @@ SLOmotion allows you to track movies.
 tags_metadata = [
     {"name": "user", "description": "Create a user account"},
     {"name": "watchlist", "description": "View and comment on watchlists."},
+    {"name": "recommended", "description": "Get recommended movies based on your watchlist"},
+    {"name": "ratings", "description": "Get the ratings for a specific movie"}
 ]
 
 app = FastAPI(
