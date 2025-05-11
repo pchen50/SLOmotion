@@ -33,6 +33,12 @@ class WatchedMovie(BaseModel):
     rating: int
     genre: str
 
+class AddToWatchlist(BaseModel):
+    rating: int | None = None
+    notes: str | None = None
+    status: str
+
+
 @router.get("/{user_id}/watched", response_model=List[WatchedMovie])
 def get_watched(user_id: int) -> List[WatchedMovie]:
     print(user_id)
@@ -177,18 +183,140 @@ def post_comment_on_movie_rating(user_id: int, movie_id: int, user2_id: int, com
             """
         ), {"commenter_user_id": user2_id, "user_id": user_id, "movie_id": movie_id, "comment_text": comment.comment_text})
 
+    return {"message": "Comment added."}
+
 
 @router.patch("/{user_id}/{movie_id}",status_code=status.HTTP_200_OK)
-def update_watchlist_movie_entry(user_id: int, movie_id: int):
-    pass
+def update_watchlist_movie_entry(user_id: int, movie_id: int, update: MovieRating):
+    # Updates a user's description/rating for a movie in their watchlist
+
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                UPDATE movie_ratings
+                SET notes = :notes, rating = :rating, status = :status
+                WHERE user_id = :user_id AND movie_id = :movie_id"""
+            ),
+            {"user_id": user_id, "movie_id": movie_id, "notes": update.notes, "rating": update.rating, "status": update.status},
+        )
+
+        if result.rowcount == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie rating not found for this user.")
+        
+    return {"message" : "Successfully updated!"}
 
 
 @router.post("/{user_id}/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
-def post_movie_onto_watchlist(user_id:int):
-    pass
+def post_movie_onto_watchlist(user_id:int, movie_id:int, movie: AddToWatchlist):
     # posts in watchlist movie and movie ratings but in movie ratings it won't have rating or notes?
+
+    # check if movie already exists in watchlist
+    with db.engine.begin() as connection:
+        exists = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT id 
+                FROM movie_ratings
+                WHERE user_id = :user_id AND movie_id = :movie_id
+                """
+            ),
+            {"user_id": user_id, "movie_id": movie_id}
+        ).one_or_none()
+
+        if exists:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Movie already exists in watchlist.")
+        
+        # if it doesn't exist, insert into movie ratings table
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                INSERT INTO movie_ratings (user_id, movie_id, notes, rating, status)
+                VALUES (:user_id, :movie_id, :notes, :rating, :status)
+                RETURNING id
+                """
+            ),
+            {"user_id": user_id, "movie_id": movie_id, "notes": movie.notes or "N/A", "rating": movie.rating or 0, "status": movie.status}
+        )
+
+        movie_rating_id = result.scalar()
+
+        # get the watchlist id for the user
+        watchlist = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT id
+                FROM watchlists
+                WHERE user_id = :user_id
+                """
+            ),
+            {"user_id": user_id}
+        ).one()
+
+        # insert into watchlist_movie table
+        connection.execute(
+            sqlalchemy.text(
+                """
+                INSERT INTO watchlist_movie (watchlist_id, movie_rating_id)
+                VALUES (:watchlist_id, :movie_rating_id)
+                """
+            ),
+            {"watchlist_id": watchlist.id, "movie_rating_id": movie_rating_id}
+        )
 
 @router.delete("/{user_id}/{movie_id}", status_code=status.HTTP_200_OK)
 def delete_users_movie_entry(user_id: int, movie_id: int):
     # delete from movie ratings, watchlist movies, and any comments on it
-    pass
+    
+    # gets movie rating id from movie ratings table
+    with db.engine.begin() as connection:
+        rating = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT id 
+                FROM movie_ratings
+                WHERE user_id = :user_id AND movie_id = :movie_id
+                """
+            ),
+            {"user_id": user_id, "movie_id": movie_id}
+        ).one_or_none()
+
+        if rating is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie rating not found for this user and movie.")
+        
+        movie_rating_id = rating.id
+
+        # delete comments linked to the movie rating
+        connection.execute(
+            sqlalchemy.text(
+                """
+                DELETE FROM comments
+                WHERE user_id = :user_id AND movie_id = :movie_id
+                """
+            ),
+            {"user_id": user_id, "movie_id": movie_id}
+        )
+
+        # delete from watchlist_movie table
+        connection.execute(
+            sqlalchemy.text(
+                """
+                DELETE FROM watchlist_movie
+                WHERE movie_rating_id = :movie_rating_id
+                """
+            ),
+            {"movie_rating_id": movie_rating_id}
+        )
+
+        # delete from movie ratings table
+        connection.execute(
+            sqlalchemy.text(
+                """
+                DELETE FROM movie_ratings
+                WHERE id = :movie_rating_id
+                """
+            ),
+            {"movie_rating_id": movie_rating_id}
+        )
+
+    return {"Message": "Successfully removed movie."}
