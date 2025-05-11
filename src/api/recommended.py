@@ -21,3 +21,6 @@ class Movie(BaseModel):
 @router.get("/{user_id}", response_model=List[Movie])
 def get_recommended_movies(user_id: int) -> List[Movie]:
     pass
+    # if user doesn't exist raise an error
+    # if user doesn't have anything on watchlist return first five movies
+    # otherwise go off of top genre and return 5 movies from that genre

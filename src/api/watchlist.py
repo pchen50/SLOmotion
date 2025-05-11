@@ -52,7 +52,12 @@ def get_watched(user_id: int) -> List[WatchedMovie]:
                 """
             ),
             [{"user_id": user_id}],
-        ).one()
+        ).one_or_none()
+        if row == None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User doesn't exist",
+            )
         watchlist_id = row.id
         print(row)
         # Then from that get all the movie_rating ids associated with watchlist id
@@ -99,7 +104,12 @@ def get_watchlist_movies(
                 """
             ),
             [{"user_id": user_id}],
-        ).one()
+        ).one_or_none()
+        if row == None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User doesn't exist",
+            )
         watchlist_id = row.id
         # Then from that get all the movie_rating ids associated with watchlist id
         result = connection.execute(
