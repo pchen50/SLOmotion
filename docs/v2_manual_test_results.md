@@ -159,7 +159,7 @@ Server Response:
     "user_id": "376541",
     "movie_id": "tt3566834",
     "status": "want to watch"
-  }'
+  }
 ```
 
 Server response:
