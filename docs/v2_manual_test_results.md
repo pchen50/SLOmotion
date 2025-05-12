@@ -52,52 +52,6 @@ curl -X 'GET' \
   -H 'access_token: SLOmotion44'
 
 Server response:
-```json
- [
-  {
-    "movie_id": 40,
-    "title": "Gladiator",
-    "status": "watched",
-    "rating": 6,
-    "genre": "Action"
-  },
-  {
-    "movie_id": 84,
-    "title": "Good Will Hunting",
-    "status": "watched",
-    "rating": 7,
-    "genre": "Drama"
-  }
-]
-```
-
-## 3. Watchlist User Adds and Removes Movies Example Flow
-Eve gets a recommendation to watch *A Minecraft Movie*, but later changes her mind.
-
-- Eve calls `GET /ratings/tt3566834` and sees strong user ratings.
-- She adds the movie using `POST /watchlist/376541/tt3566834`
-  ```json
-  {
-    "user_id": "376541",
-    "movie_id": "tt3566834",
-    "status": "want to watch"
-  }
-  ```
-- After watching, Eve decides to remove it using:
-  `DELETE /watchlist/376541/tt3566834`
-- Server responds:
-  ```json
-  { "Message": "Successfully removed movie." }
-  ```
-
-## Testing results for flow 3
-
-
-## 4. Get User's Recommendations
-Bob finishes watching Gladiator and wants to find more movies he'll enjoy based on his watchlist history.
-
-- Bob calls `GET /recommended_movies/5` (User ID 5 belongs to Bob)
-- Server response
   ```json
   [
     {
@@ -127,5 +81,63 @@ Bob finishes watching Gladiator and wants to find more movies he'll enjoy based 
     }
   ]
   ```
-- The server returns 5 movies from the most common genre in Bob’s watchlist: Action
+
+## 3. Watchlist User Adds and Removes Movies Example Flow
+Eve gets a recommendation to watch *A Minecraft Movie*, but later changes her mind.
+
+- Eve calls `GET /ratings/tt3566834` and sees strong user ratings.
+- She adds the movie using `POST /watchlist/376541/tt3566834`
+  ```json
+  {
+    "user_id": "376541",
+    "movie_id": "tt3566834",
+    "status": "want to watch"
+  }
+  ```
+- After watching, Eve decides to remove it using:
+  `DELETE /watchlist/376541/tt3566834`
+- Server responds:
+  ```json
+  { "Message": "Successfully removed movie." }
+  ```
+
+## Testing results for flow 3
+
+
+## 4. Get User's Recommendations
+Joe finishes watching Good Will Hunting and wants to find more movies he'll enjoy based on his watchlist history.
+
+- Joe calls `GET /recommended_movies/6` (User ID 6 belongs to Joe)
+- Server response
+  ```json
+    [
+      {
+        "movie_id": 13,
+        "name": "The Good, the Bad and the Ugly",
+        "genre": "Adventure"
+      },
+      {
+        "movie_id": 28,
+        "name": "Interstellar",
+        "genre": "Adventure"
+      },
+      {
+        "movie_id": 33,
+        "name": "Back to the Future",
+        "genre": "Adventure"
+      },
+      {
+        "movie_id": 74,
+        "name": "Inglourious Basterds",
+        "genre": "Adventure"
+      },
+      {
+        "movie_id": 94,
+        "name": "2001: A Space Odyssey",
+        "genre": "Adventure"
+      }
+    ]
+  
+  ```
+- The server returns 5 movies from the genre Adventure, which is tied for the most common in Joe’s watchlist. Since Adventure appears first when counts are tied (alphabetical or order by default), those recommendations are selected.
 
