@@ -14,17 +14,14 @@ router = APIRouter(
 
 class Rating(BaseModel):
     user_id: int
-    movie_id: int
-    status: str
     rating: int
-    notes: str
 
 @router.get("/{movie_id}", response_model=List[Rating])
 def get_movie_ratings(movie_id: int) -> List[Rating]:
     with db.engine.connect() as conn:
         results = conn.execute(sqlalchemy.text(
             """
-            SELECT user_id, movie_id, status, rating, notes
+            SELECT user_id, rating
             FROM movie_ratings
             WHERE movie_id = :movie_id
             """
@@ -34,10 +31,7 @@ def get_movie_ratings(movie_id: int) -> List[Rating]:
         for row in results:
             ratings.append(Rating(
                 user_id = row.user_id,
-                movie_id = row.movie_id,
-                status = row.status,
-                rating = row.rating,
-                notes = row.notes
+                rating = row.rating
             ))
 
         return ratings
