@@ -6,8 +6,8 @@ from src.api import auth
 from src import database as db
 
 router = APIRouter(
-    prefix="/ratings",
-    tags=["ratings"],
+    prefix="/movies",
+    tags=["movies"],
     dependencies=[Depends(auth.get_api_key)],
 )
 
@@ -16,7 +16,30 @@ class Rating(BaseModel):
     user_id: int
     rating: int
 
-@router.get("/{movie_id}", response_model=List[Rating])
+@router.get("/{movie_name}", response_model=int)
+def get_movie_id(movie_name: str) -> int:
+    with db.engine.connect() as connection:
+        id = connection.execute(
+            sqlalchemy.text
+            (
+                """
+                SELECT id
+                FROM movies
+                WHERE name = :movie_name
+                """
+            ), {"movie_name": movie_name}
+        ).one_or_none()
+
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Movie name not formatted correctly or not in IMDb top 250 list",
+            )
+
+        return id.id
+    
+
+@router.get("/ratings/{movie_id}", response_model=List[Rating])
 def get_movie_ratings(movie_id: int) -> List[Rating]:
     with db.engine.connect() as conn:
         results = conn.execute(sqlalchemy.text(

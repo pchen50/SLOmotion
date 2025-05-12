@@ -53,7 +53,7 @@ def get_watched(user_id: int) -> List[WatchedMovie]:
             ),
             [{"user_id": user_id}],
         ).one_or_none()
-        if row == None:
+        if row is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User doesn't exist",
@@ -105,7 +105,7 @@ def get_watchlist_movies(
             ),
             [{"user_id": user_id}],
         ).one_or_none()
-        if row == None:
+        if row is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User doesn't exist",

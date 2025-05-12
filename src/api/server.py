@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.api import user, watchlist, recommended, ratings
+from src.api import user, watchlist, recommended, movies
 from starlette.middleware.cors import CORSMiddleware
 
 description = """
@@ -9,7 +9,7 @@ tags_metadata = [
     {"name": "user", "description": "Create a user account"},
     {"name": "watchlist", "description": "View and comment on watchlists."},
     {"name": "recommended", "description": "Get recommended movies based on your watchlist"},
-    {"name": "ratings", "description": "Get the ratings for a specific movie"}
+    {"name": "movies", "description": "Get information on specific movies"}
 ]
 
 app = FastAPI(
@@ -37,7 +37,7 @@ app.add_middleware(
 app.include_router(user.router)
 app.include_router(watchlist.router)
 app.include_router(recommended.router)
-app.include_router(ratings.router)
+app.include_router(movies.router)
 
 
 @app.get("/")
