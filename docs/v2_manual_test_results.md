@@ -52,6 +52,32 @@ curl -X 'GET' \
   -H 'access_token: SLOmotion44'
 
 Server response:
+```json
+ [
+  {
+    "movie_id": 40,
+    "title": "Gladiator",
+    "status": "watched",
+    "rating": 6,
+    "genre": "Action"
+  },
+  {
+    "movie_id": 84,
+    "title": "Good Will Hunting",
+    "status": "watched",
+    "rating": 7,
+    "genre": "Drama"
+  }
+]
+```
+Alic calls `GET /recommended_movies/4` (her user_id is 4)
+
+curl -X 'GET' \
+  'https://slomotion.onrender.com/recommended_movies/4' \
+  -H 'accept: application/json' \
+  -H 'access_token: SLOmotion44'
+
+  Server response:
   ```json
   [
     {
@@ -104,40 +130,4 @@ Eve gets a recommendation to watch *A Minecraft Movie*, but later changes her mi
 ## Testing results for flow 3
 
 
-## 4. Get User's Recommendations
-Joe finishes watching Good Will Hunting and wants to find more movies he'll enjoy based on his watchlist history.
-
-- Joe calls `GET /recommended_movies/6` (User ID 6 belongs to Joe)
-- Server response
-  ```json
-    [
-      {
-        "movie_id": 13,
-        "name": "The Good, the Bad and the Ugly",
-        "genre": "Adventure"
-      },
-      {
-        "movie_id": 28,
-        "name": "Interstellar",
-        "genre": "Adventure"
-      },
-      {
-        "movie_id": 33,
-        "name": "Back to the Future",
-        "genre": "Adventure"
-      },
-      {
-        "movie_id": 74,
-        "name": "Inglourious Basterds",
-        "genre": "Adventure"
-      },
-      {
-        "movie_id": 94,
-        "name": "2001: A Space Odyssey",
-        "genre": "Adventure"
-      }
-    ]
-  
-  ```
-- The server returns 5 movies from the genre Adventure, which is tied for the most common in Joe’s watchlist. Since Adventure appears first when counts are tied (alphabetical or order by default), those recommendations are selected.
 
