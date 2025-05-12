@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Literal
 import sqlalchemy
 from src.api import auth
 from src import database as db
@@ -23,8 +23,8 @@ class MovieRating(BaseModel):
     movie_id: int
     user_id: int
     notes: str
-    rating: int
-    status: str
+    rating: int | None = None
+    status: Literal["watched", "want to watch", "watching"]
 
 class WatchedMovie(BaseModel):
     movie_id: int
@@ -36,7 +36,8 @@ class WatchedMovie(BaseModel):
 class AddToWatchlist(BaseModel):
     rating: int | None = None
     notes: str | None = None
-    status: str
+    status: Literal["watched", "want to watch", "watching"]
+
 
 
 @router.get("/{user_id}/watched", response_model=List[WatchedMovie])
@@ -246,7 +247,7 @@ def post_movie_onto_watchlist(user_id:int, movie_id:int, movie: AddToWatchlist):
                 RETURNING id
                 """
             ),
-            {"user_id": user_id, "movie_id": movie_id, "notes": movie.notes or "N/A", "rating": movie.rating or 0, "status": movie.status}
+            {"user_id": user_id, "movie_id": movie_id, "notes": movie.notes or "N/A", "rating": movie.rating if movie.rating is not None else None, "status": movie.status}
         )
 
         movie_rating_id = result.scalar()
