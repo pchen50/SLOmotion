@@ -91,3 +91,41 @@ Eve gets a recommendation to watch *A Minecraft Movie*, but later changes her mi
   ```
 
 ## Testing results for flow 3
+
+
+## 4. Get User's Recommendations
+Bob finishes watching Gladiator and wants to find more movies he'll enjoy based on his watchlist history.
+
+- Bob calls `GET /recommended_movies/5` (User ID 5 belongs to Bob)
+- Server response
+  ```json
+  [
+    {
+      "movie_id": 6,
+      "name": "The Dark Knight",
+      "genre": "Action"
+    },
+    {
+      "movie_id": 10,
+      "name": "The Lord of the Rings: The Return of the King",
+      "genre": "Action"
+    },
+    {
+      "movie_id": 12,
+      "name": "The Lord of the Rings: The Fellowship of the Ring",
+      "genre": "Action"
+    },
+    {
+      "movie_id": 16,
+      "name": "The Lord of the Rings: The Two Towers",
+      "genre": "Action"
+    },
+    {
+      "movie_id": 17,
+      "name": "Inception",
+      "genre": "Action"
+    }
+  ]
+  ```
+- The server returns 5 movies from the most common genre in Bob’s watchlist: Action
+
