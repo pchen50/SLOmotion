@@ -43,6 +43,26 @@ Alice finishes watching *Barbie* and updates its status in her watchlist. She th
 - She then calls `GET /recommended_movies/456219` to receive personalized recommendations.
 
 ## Testing results for flow 2
+Alice updates Barbie to "watched" in her watchlist.
+curl -X 'PATCH' \
+  'https://slomotion.onrender.com/watchlist/4/254' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H 'access_token: SLOmotion44' \
+  -d '{
+    "user_id": 4,
+    "movie_id": 254,
+    "status": "watched",
+    "rating": 8,
+    "notes": "Great movie, would watch again!"
+  }'
+
+Server response:
+```json
+{
+  "message": "Successfully updated!"
+}
+```
 
 To check Bob's watchlist she calls `GET /watchlist/5/watched` since Bob's user_id is 5.
 
