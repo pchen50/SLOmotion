@@ -14,7 +14,7 @@ router = APIRouter(
 
 class Rating(BaseModel):
     user_id: int
-    rating: int
+    rating: int | None
 
 @router.get("/{movie_name}", response_model=int)
 def get_movie_id(movie_name: str) -> int:

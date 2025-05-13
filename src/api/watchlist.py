@@ -330,4 +330,4 @@ def delete_users_movie_entry(user_id: int, movie_id: int):
             {"movie_rating_id": movie_rating_id}
         )
 
-    return {"Message": "Successfully removed movie."}
+    return {"message": "Successfully removed movie."}
