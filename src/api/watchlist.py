@@ -274,6 +274,8 @@ def post_movie_onto_watchlist(user_id:int, movie_id:int, movie: AddToWatchlist):
             ),
             {"watchlist_id": watchlist.id, "movie_rating_id": movie_rating_id}
         )
+    
+    return {"message": "Successfully added movie to watchlist."}
 
 @router.delete("/{user_id}/{movie_id}", status_code=status.HTTP_200_OK)
 def delete_users_movie_entry(user_id: int, movie_id: int):

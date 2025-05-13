@@ -129,11 +129,10 @@ Eve gets a recommendation to watch *A Minecraft Movie*, but later changes her mi
 
 ## Testing results for flow 3
 
-
-Eve calls `GET /ratings/tt3566834` to view the rating for *Good Will Hunting*.
+Eve calls `GET /movies/ratings/254` to view the rating for *A Minecraft Movie*.
 
 curl -X 'GET' \
-  'https://slomotion.onrender.com/ratings/tt3566834' \
+  'https://slomotion.onrender.com/movies/ratings/254' \
   -H 'accept: application/json' \
   -H 'access_token: SLOmotion44'
 
@@ -141,47 +140,48 @@ Server response:
 ```json
 [
   {
-    "user_id": 10,
-    "rating": 7
+    "user_id": 4,
+    "rating": 10
   },
   {
-    "user_id": 12,
-    "rating": 7
-  },
-  {
-    "user_id": 11,
-    "rating": 0
+    "user_id": 5,
+    "rating": 9
   }
 ]
 ```
 
-Eve adds the movie by calling POST /watchlist/376541/tt3566834.
+Eve adds the movie by calling POST /watchlist/7/254.
 curl -X 'POST' \
-  'https://slomotion.onrender.com/watchlist/376541/tt3566834' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
+  'https://slomotion.onrender.com/watchlist/7/254' \
+  -H 'accept: */*' \
   -H 'access_token: SLOmotion44' \
-Server Response:
+  -H 'Content-Type: application/json' \
+
 ```json
 {
-  "movie_id": 585,
-  "user_id": 10,
-  "notes": "really good",
-  "rating": 7,
-  "status": "watched"
+  "rating": null,
+  "notes": "Can't Wait!",
+  "status": "want to watch"
 }
 ```
+
 Server response:
  ```json
-{ "message": "Movie successfully added to watchlist." }
+{
+  "message": "Successfully added movie to watchlist."
+}
+
 ```
-Eve changes her mind and removes the movie with DELETE /watchlist/376541/tt3566834.
+Eve changes her mind and removes the movie with DELETE /watchlist/7/254.
 curl -X 'DELETE' \
-  'https://slomotion.onrender.com/watchlist/376541/tt3566834' \
+  'https://slomotion.onrender.com/watchlist/7/254' \
   -H 'accept: application/json' \
   -H 'access_token: SLOmotion44'
+
 Server response:
 ```json
-{ "message": "Successfully removed movie." }
+{
+  "Message": "Successfully removed movie."
+}
 ```
 
