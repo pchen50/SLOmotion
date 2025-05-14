@@ -99,33 +99,33 @@ curl -X 'GET' \
 
   Server response:
   ```json
-[
-  {
-    "movie_id": 29,
-    "name": "Life Is Beautiful",
-    "genre": "Comedy"
-  },
-  {
-    "movie_id": 50,
-    "name": "Modern Times",
-    "genre": "Comedy"
-  },
-  {
-    "movie_id": 55,
-    "name": "City Lights",
-    "genre": "Comedy"
-  },
-  {
-    "movie_id": 65,
-    "name": "The Great Dictator",
-    "genre": "Comedy"
-  },
-  {
-    "movie_id": 71,
-    "name": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
-    "genre": "Comedy"
-  }
-]
+  [
+    {
+      "movie_id": 29,
+      "name": "Life Is Beautiful",
+      "genre": "Comedy"
+    },
+    {
+      "movie_id": 50,
+      "name": "Modern Times",
+      "genre": "Comedy"
+    },
+    {
+      "movie_id": 55,
+      "name": "City Lights",
+      "genre": "Comedy"
+    },
+    {
+      "movie_id": 65,
+      "name": "The Great Dictator",
+      "genre": "Comedy"
+    },
+    {
+      "movie_id": 71,
+      "name": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
+      "genre": "Comedy"
+    }
+  ]
   ```
 
 ## 3. Watchlist User Adds and Removes Movies Example Flow
