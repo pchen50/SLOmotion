@@ -126,7 +126,6 @@ curl -X 'GET' \
     "genre": "Comedy"
   }
 ]
-Response headers
   ```
 
 ## 3. Watchlist User Adds and Removes Movies Example Flow
