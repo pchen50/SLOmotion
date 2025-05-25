@@ -1,5 +1,21 @@
-1. Dirty Read
+# Concurrency 
+---
+## 1. Dirty Read
+- 
+#### Sequence Diagram
 
-2. Non-Repeatable Read
 
-3. Phantom Read
+
+---
+## 2. Non-Repeatable Read
+-
+#### Sequence Diagram
+
+
+
+---
+## 3. Phantom Read
+-
+#### Sequence Diagram
+
+
