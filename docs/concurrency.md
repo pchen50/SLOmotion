@@ -2,20 +2,20 @@
 ---
 ## 1. Dirty Read
 - 
-#### Sequence Diagram
+### Sequence Diagram
 
 
 
 ---
 ## 2. Non-Repeatable Read
 -
-#### Sequence Diagram
+### Sequence Diagram
 
 
 
 ---
 ## 3. Phantom Read
 -
-#### Sequence Diagram
+### Sequence Diagram
 
 
