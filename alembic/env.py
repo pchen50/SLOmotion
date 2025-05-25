@@ -14,7 +14,8 @@ config = context.config
 config.set_main_option(
     "sqlalchemy.url",
     os.getenv(
-        "POSTGRES_URI", "postgresql+psycopg://myuser:mypassword2@localhost:5433/mydatabase"
+        "POSTGRES_URI",
+        "postgresql+psycopg://myuser:mypassword2@localhost:5433/mydatabase",
     ),
 )
 

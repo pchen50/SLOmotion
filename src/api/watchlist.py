@@ -26,6 +26,7 @@ class MovieRating(BaseModel):
     rating: int | None = None
     status: Literal["watched", "want to watch", "watching"]
 
+
 class WatchedMovie(BaseModel):
     movie_id: int
     title: str
@@ -33,15 +34,18 @@ class WatchedMovie(BaseModel):
     rating: int
     genre: str
 
+
 class AddToWatchlist(BaseModel):
     rating: int | None = None
     notes: str | None = None
     status: Literal["watched", "want to watch", "watching"]
 
+
 class RecentNotes(BaseModel):
     movie1: str | None = None
     movie2: str | None = "n/a"
     movie3: str | None = "n/a"
+
 
 class WatchlistStats(BaseModel):
     user_id: int
@@ -97,7 +101,7 @@ def get_user_stats(user_id: int):
             )
         movieNotes = RecentNotes()
         for i, notes in notes.items():
-            setattr(movieNotes,i,notes)
+            setattr(movieNotes, i, notes)
         return WatchlistStats(
             user_id=user_id,
             watchedMovieCount=watchedCount,
@@ -105,9 +109,9 @@ def get_user_stats(user_id: int):
             recentNotes=movieNotes,
             watchingMovieCount=watching,
             totalGenres=genres,
-            averageRating=round(sum(all_ratings)/watchedCount, 2)
+            averageRating=round(sum(all_ratings) / watchedCount, 2),
         )
-        
+
 
 @router.get("/{user_id}/watched", response_model=List[WatchedMovie])
 def get_watched(user_id: int) -> List[WatchedMovie]:
@@ -144,21 +148,21 @@ def get_watched(user_id: int) -> List[WatchedMovie]:
             ),
             [{"watchlist_id": watchlist_id}],
         ).tuples()
-        #for all movie rating ids return the movie_rating, movie_ids, and their names
+        # for all movie rating ids return the movie_rating, movie_ids, and their names
         watched_movies = []
         for movie in result:
             print(movie)
             watched_movies.append(
                 WatchedMovie(
                     movie_id=movie.movie_id,
-                    title = movie.name,
-                    status = movie.status,
-                    rating = movie.rating,
-                    genre = movie.genre
+                    title=movie.name,
+                    status=movie.status,
+                    rating=movie.rating,
+                    genre=movie.genre,
                 )
             )
         return watched_movies
-    
+
 
 @router.get("/{user_id}", response_model=List[WatchlistMovie])
 def get_watchlist_movies(
@@ -203,7 +207,7 @@ def get_watchlist_movies(
                     watchlist_id=movie.watchlist_id,
                     movie_id=movie.movie_id,
                     name=movie.name,
-                    status = movie.status
+                    status=movie.status,
                 )
             )
         return watchlist_movies
@@ -236,38 +240,58 @@ def get_movie_rating(
             user_id=result.user_id,
             notes=result.notes,
             rating=result.rating,
-            status=result.status
+            status=result.status,
         )
+
 
 class CommentInput(BaseModel):
     comment_text: str
 
-@router.post("/{user_id}/{movie_id}/{user2_id}/comment",status_code=status.HTTP_204_NO_CONTENT)
-def post_comment_on_movie_rating(user_id: int, movie_id: int, user2_id: int, comment: CommentInput):
+
+@router.post(
+    "/{user_id}/{movie_id}/{user2_id}/comment", status_code=status.HTTP_204_NO_CONTENT
+)
+def post_comment_on_movie_rating(
+    user_id: int, movie_id: int, user2_id: int, comment: CommentInput
+):
     with db.engine.begin() as connection:
-        rating = connection.execute(sqlalchemy.text(
-            """
+        rating = connection.execute(
+            sqlalchemy.text(
+                """
             SELECT 1
             FROM movie_ratings
             WHERE user_id = :user_id AND movie_id = :movie_id
             """
-        ), {"user_id": user_id, "movie_id": movie_id}).one_or_none()
+            ),
+            {"user_id": user_id, "movie_id": movie_id},
+        ).one_or_none()
 
         if rating is None:
-            raise HTTPException( status_code=status.HTTP_404_NOT_FOUND, detail="Movie or user does not exist.",)
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Movie or user does not exist.",
+            )
 
         # insert comment
-        connection.execute(sqlalchemy.text(
-            """
+        connection.execute(
+            sqlalchemy.text(
+                """
             INSERT INTO comments (commenter_user_id, user_id, movie_id, comment_text)
             VALUES (:commenter_user_id, :user_id, :movie_id, :comment_text)
             """
-        ), {"commenter_user_id": user2_id, "user_id": user_id, "movie_id": movie_id, "comment_text": comment.comment_text})
+            ),
+            {
+                "commenter_user_id": user2_id,
+                "user_id": user_id,
+                "movie_id": movie_id,
+                "comment_text": comment.comment_text,
+            },
+        )
 
     return {"message": "Comment added."}
 
 
-@router.patch("/{user_id}/{movie_id}",status_code=status.HTTP_200_OK)
+@router.patch("/{user_id}/{movie_id}", status_code=status.HTTP_200_OK)
 def update_watchlist_movie_entry(user_id: int, movie_id: int, update: MovieRating):
     # Updates a user's description/rating for a movie in their watchlist
 
@@ -279,17 +303,26 @@ def update_watchlist_movie_entry(user_id: int, movie_id: int, update: MovieRatin
                 SET notes = :notes, rating = :rating, status = :status
                 WHERE user_id = :user_id AND movie_id = :movie_id"""
             ),
-            {"user_id": user_id, "movie_id": movie_id, "notes": update.notes, "rating": update.rating, "status": update.status},
+            {
+                "user_id": user_id,
+                "movie_id": movie_id,
+                "notes": update.notes,
+                "rating": update.rating,
+                "status": update.status,
+            },
         )
 
         if result.rowcount == 0:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie rating not found for this user.")
-        
-    return {"message" : "Successfully updated!"}
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Movie rating not found for this user.",
+            )
+
+    return {"message": "Successfully updated!"}
 
 
 @router.post("/{user_id}/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
-def post_movie_onto_watchlist(user_id:int, movie_id:int, movie: AddToWatchlist):
+def post_movie_onto_watchlist(user_id: int, movie_id: int, movie: AddToWatchlist):
     # posts in watchlist movie and movie ratings but in movie ratings it won't have rating or notes?
 
     # check if movie already exists in watchlist
@@ -302,12 +335,15 @@ def post_movie_onto_watchlist(user_id:int, movie_id:int, movie: AddToWatchlist):
                 WHERE user_id = :user_id AND movie_id = :movie_id
                 """
             ),
-            {"user_id": user_id, "movie_id": movie_id}
+            {"user_id": user_id, "movie_id": movie_id},
         ).one_or_none()
 
         if exists:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Movie already exists in watchlist.")
-        
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Movie already exists in watchlist.",
+            )
+
         # if it doesn't exist, insert into movie ratings table
         result = connection.execute(
             sqlalchemy.text(
@@ -317,7 +353,13 @@ def post_movie_onto_watchlist(user_id:int, movie_id:int, movie: AddToWatchlist):
                 RETURNING id
                 """
             ),
-            {"user_id": user_id, "movie_id": movie_id, "notes": movie.notes or "N/A", "rating": movie.rating if movie.rating is not None else None, "status": movie.status}
+            {
+                "user_id": user_id,
+                "movie_id": movie_id,
+                "notes": movie.notes or "N/A",
+                "rating": movie.rating if movie.rating is not None else None,
+                "status": movie.status,
+            },
         )
 
         movie_rating_id = result.scalar()
@@ -331,7 +373,7 @@ def post_movie_onto_watchlist(user_id:int, movie_id:int, movie: AddToWatchlist):
                 WHERE user_id = :user_id
                 """
             ),
-            {"user_id": user_id}
+            {"user_id": user_id},
         ).one()
 
         # insert into watchlist_movie table
@@ -342,15 +384,16 @@ def post_movie_onto_watchlist(user_id:int, movie_id:int, movie: AddToWatchlist):
                 VALUES (:watchlist_id, :movie_rating_id)
                 """
             ),
-            {"watchlist_id": watchlist.id, "movie_rating_id": movie_rating_id}
+            {"watchlist_id": watchlist.id, "movie_rating_id": movie_rating_id},
         )
-    
+
     return {"message": "Successfully added movie to watchlist."}
+
 
 @router.delete("/{user_id}/{movie_id}", status_code=status.HTTP_200_OK)
 def delete_users_movie_entry(user_id: int, movie_id: int):
     # delete from movie ratings, watchlist movies, and any comments on it
-    
+
     # gets movie rating id from movie ratings table
     with db.engine.begin() as connection:
         rating = connection.execute(
@@ -361,12 +404,15 @@ def delete_users_movie_entry(user_id: int, movie_id: int):
                 WHERE user_id = :user_id AND movie_id = :movie_id
                 """
             ),
-            {"user_id": user_id, "movie_id": movie_id}
+            {"user_id": user_id, "movie_id": movie_id},
         ).one_or_none()
 
         if rating is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie rating not found for this user and movie.")
-        
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Movie rating not found for this user and movie.",
+            )
+
         movie_rating_id = rating.id
 
         # delete comments linked to the movie rating
@@ -377,7 +423,7 @@ def delete_users_movie_entry(user_id: int, movie_id: int):
                 WHERE user_id = :user_id AND movie_id = :movie_id
                 """
             ),
-            {"user_id": user_id, "movie_id": movie_id}
+            {"user_id": user_id, "movie_id": movie_id},
         )
 
         # delete from watchlist_movie table
@@ -388,7 +434,7 @@ def delete_users_movie_entry(user_id: int, movie_id: int):
                 WHERE movie_rating_id = :movie_rating_id
                 """
             ),
-            {"movie_rating_id": movie_rating_id}
+            {"movie_rating_id": movie_rating_id},
         )
 
         # delete from movie ratings table
@@ -399,7 +445,7 @@ def delete_users_movie_entry(user_id: int, movie_id: int):
                 WHERE id = :movie_rating_id
                 """
             ),
-            {"movie_rating_id": movie_rating_id}
+            {"movie_rating_id": movie_rating_id},
         )
 
     return {"message": "Successfully removed movie."}
