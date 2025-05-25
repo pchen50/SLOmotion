@@ -146,4 +146,31 @@
       {"message": "comment successfully added"}
       ```
 
+10. **GET /watchlist/{user_id}/stats**
+   a. Description: returns general statistics for a specific user including, how many movies they've marked as watched, want to watch, and watching. Returns their average rating, all the genres encompassed in their watchlist, as well as their 3 most recent movie notes for watched movies.
+   b. body: empty
+   c. Returns the above mentioned statistics or a message saying no watchlist movies were found for the specified user.
+   d. Example return:
+   ```json
+    {
+      "user_id": 8,
+      "watchedMovieCount": 3,
+      "wantToWatchMovieCount": 0,
+      "watchingMovieCount": 0,
+      "totalGenres": {
+         "Comedy": "Barbie",
+         "Drama": "Good Will Hunting",
+         "Action": "Gladiator"
+      },
+      "recentNotes": {
+         "movie1": "Barbie: inspiring",
+         "movie2": "Good Will Hunting: enjoyed",
+         "movie3": "Gladiator: nice"
+      },
+      "averageRating": 6.67
+   }
+   ```
+   ```json
+    {"detail": "No watchlist movies found for the user"}
+   ```
 ---

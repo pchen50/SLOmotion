@@ -38,7 +38,76 @@ class AddToWatchlist(BaseModel):
     notes: str | None = None
     status: Literal["watched", "want to watch", "watching"]
 
+class RecentNotes(BaseModel):
+    movie1: str | None = None
+    movie2: str | None = "n/a"
+    movie3: str | None = "n/a"
 
+class WatchlistStats(BaseModel):
+    user_id: int
+    watchedMovieCount: int
+    wantToWatchMovieCount: int
+    watchingMovieCount: int
+    totalGenres: dict[str, str]
+    recentNotes: RecentNotes
+    averageRating: float
+
+
+@router.get("/{user_id}/stats", response_model=WatchlistStats)
+def get_user_stats(user_id: int):
+    print(user_id)
+    with db.engine.begin() as connection:
+        movies = connection.execute(
+            sqlalchemy.text(
+                """ 
+                    SELECT movie_id, user_id, notes, rating, status, name, genre
+                    FROM movie_ratings
+                    JOIN movies on movies.id = movie_ratings.movie_id
+                    WHERE user_id = :user_id
+                    ORDER BY movie_ratings.id DESC
+                """
+            ),
+            [{"user_id": user_id}],
+        ).tuples()
+        watchedCount = 0
+        wantToWatch = 0
+        watching = 0
+        genres = {}
+        all_ratings = []
+        notes = {}
+        for movie in movies:
+            if movie.status == "want to watch":
+                wantToWatch += 1
+            elif movie.status == "watching":
+                watching += 1
+            elif movie.status == "watched":
+                watchedCount += 1
+                all_ratings.append(movie.rating)
+                if watchedCount <= 3 and movie.notes:
+                    notes[f"movie{watchedCount}"] = movie.name + ": " + movie.notes
+            if movie.genre in genres:
+                genres[movie.genre] += ", " + movie.name
+            else:
+                genres[movie.genre] = movie.name
+
+        if watchedCount + wantToWatch + watching == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No watchlist movies found for the user",
+            )
+        movieNotes = RecentNotes()
+        for i, notes in notes.items():
+            setattr(movieNotes,i,notes)
+        return WatchlistStats(
+            user_id=user_id,
+            watchedMovieCount=watchedCount,
+            wantToWatchMovieCount=wantToWatch,
+            recentNotes=movieNotes,
+            watchingMovieCount=watching,
+            totalGenres=genres,
+            averageRating=round(sum(all_ratings)/watchedCount, 2)
+        )
+        
 
 @router.get("/{user_id}/watched", response_model=List[WatchedMovie])
 def get_watched(user_id: int) -> List[WatchedMovie]:
@@ -89,6 +158,7 @@ def get_watched(user_id: int) -> List[WatchedMovie]:
                 )
             )
         return watched_movies
+    
 
 @router.get("/{user_id}", response_model=List[WatchlistMovie])
 def get_watchlist_movies(
