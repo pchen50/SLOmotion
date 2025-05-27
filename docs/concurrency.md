@@ -5,7 +5,8 @@
 - Example: 2 users try to update or read the same movie rating at the same time, user 1 updates the movie rating ```PATCH /watchlist/{user_id}/{movie_id}``` while user 2 requests user 1's watch list ```GET /watchlist/{user_id}/watched```. Without concurrency control, the second users transaction could read uncommitted changes made by the first user. This would be a dirty read and it could act on data that might be rolled back at a later time.
 - To ensure that this does not happen, the db.engine.begin() wrapper makes sure that the update is wrapped in a transaction. PostgreSQL also uses a READ COMMITTED isolation level by default, preventing the possibility of dirty reads. 
 ### Sequence Diagram
-<img width="433" alt="image" src="https://github.com/user-attachments/assets/8064e798-487d-4d6a-b9ad-f235494e2627" />
+<img width="439" alt="image" src="https://github.com/user-attachments/assets/382c31a8-475d-48cf-8f0d-d5fb5dff3ae6" />
+
 
 ---
 ## 2. Non-Repeatable Read
