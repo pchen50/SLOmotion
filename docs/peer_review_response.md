@@ -6,10 +6,6 @@
 - 
 ### Schema/API Design
 - 
-### Product Ideas
-- 
-### Test Result 
-- 
 
 ---
 
@@ -18,11 +14,6 @@
 - 
 ### Schema/API Design
 - 
-### Product Ideas
-- 
-### Test Result 
-- 
-
 
 ---
 
@@ -30,8 +21,4 @@
 ### Code Review
 - 
 ### Schema/API Design
-- 
-### Product Ideas
-- 
-### Test Result 
 - 
