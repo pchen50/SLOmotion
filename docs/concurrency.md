@@ -24,5 +24,6 @@
 - Example: User 1 wants to see the list of watched movies, calling ```GET /watchlist/{user_id}/watched``` and sees 4 movies that are marked as "watched". However, before the transaction ends, another process adds a 5th movie with the "watched" status. If the original request reruns the same query before committing, it could now see 5 movies.
 - This doesn't happen in our system because each API request runs in its own transaction. Queries are not re-run in the same transaction and only the owner of the watchlist can modify the data. 
 ### Sequence Diagram
+<img width="430" alt="image" src="https://github.com/user-attachments/assets/e66398a6-ebea-4b50-8a66-38b5a1269f8b" />
 
 
