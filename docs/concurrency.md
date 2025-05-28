@@ -14,7 +14,7 @@
 - Example: User 1 reads a movie rating, calling the ```GET /watchlist/{user_id}/{movie_id}```. Before this transaction ends, another user (user 2) updates the movie rating using ```PATCH /watchlist/{user_id}/{movie_id}```. Still in the original transaction, user 1 reads the rating again but sees a different result.
 - This doesn't happen because each endpoint function is wrapped using with db.engine.begin() as connection: and because users can only update their own ratings. 
 ### Sequence Diagram
-<img width="440" alt="image" src="https://github.com/user-attachments/assets/e138d998-75a9-4aa2-bc79-5a6ba3621303" />
+<img width="398" alt="image" src="https://github.com/user-attachments/assets/8ae8dfca-1906-4b1d-ac58-e3041c9c7b74" />
 
 
 
