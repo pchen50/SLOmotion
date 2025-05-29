@@ -1,0 +1,251 @@
+Id,name,genre,year
+1,The Shawshank Redemption,Drama,1994
+2,The Godfather,Crime,1972
+3,The Dark Knight,Action,2008
+4,The Godfather Part II,Crime,1974
+5,12 Angry Men,Crime,1957
+6,Schindler's List,Biography,1993
+7,The Lord of the Rings: The Return of the King,Action,2003
+8,Pulp Fiction,Crime,1994
+9,The Lord of the Rings: The Fellowship of the Ring,Action,2001
+10,"The Good, the Bad and the Ugly",Adventure,1966
+11,Forrest Gump,Drama,1994
+12,Fight Club,Drama,1999
+13,The Lord of the Rings: The Two Towers,Action,2002
+14,Inception,Action,2010
+15,Star Wars: Episode V - The Empire Strikes Back,Action,1980
+16,The Matrix,Action,1999
+17,Goodfellas,Biography,1990
+18,One Flew Over the Cuckoo's Nest,Drama,1975
+19,Se7en,Crime,1995
+20,Seven Samurai,Action,1954
+21,It's a Wonderful Life,Drama,1946
+22,The Silence of the Lambs,Crime,1991
+23,City of God,Crime,2002
+24,Saving Private Ryan,Drama,1998
+25,Interstellar,Adventure,2014
+26,Life Is Beautiful,Comedy,1997
+27,The Green Mile,Crime,1999
+28,Star Wars: Episode IV - A New Hope,Action,1977
+29,Terminator 2: Judgment Day,Action,1991
+30,Back to the Future,Adventure,1985
+31,Spirited Away,Animation,2001
+32,The Pianist,Biography,2002
+33,Psycho,Horror,1960
+34,Parasite,Drama,2019
+35,Léon: The Professional,Action,1994
+36,The Lion King,Animation,1994
+37,Gladiator,Action,2000
+38,American History X,Crime,1998
+39,The Departed,Crime,2006
+40,The Usual Suspects,Crime,1995
+41,The Prestige,Drama,2006
+42,Whiplash,Drama,2014
+43,Casablanca,Drama,1942
+44,Grave of the Fireflies,Animation,1988
+45,Harakiri,Action,1962
+46,The Intouchables,Biography,2011
+47,Modern Times,Comedy,1936
+48,Once Upon a Time in the West,Western,1968
+49,Rear Window,Mystery,1954
+50,Cinema Paradiso,Drama,1988
+51,Alien,Horror,1979
+52,City Lights,Comedy,1931
+53,Apocalypse Now,Drama,1979
+54,Memento,Mystery,2000
+55,Django Unchained,Drama,2012
+56,Indiana Jones and the Raiders of the Lost Ark,Action,1981
+57,WALL·E,Animation,2008
+58,The Lives of Others,Drama,2006
+59,Sunset Blvd.,Drama,1950
+60,Paths of Glory,Drama,1957
+61,The Shining,Drama,1980
+62,The Great Dictator,Comedy,1940
+63,Avengers: Infinity War,Action,2018
+64,Witness for the Prosecution,Crime,1957
+65,Aliens,Action,1986
+66,Spider-Man: Into the Spider-Verse,Animation,2018
+67,American Beauty,Drama,1999
+68,Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb,Comedy,1964
+69,The Dark Knight Rises,Action,2012
+70,Oldboy,Action,2003
+71,Inglourious Basterds,Adventure,2009
+72,Amadeus,Biography,1984
+73,Coco,Animation,2017
+74,Toy Story,Animation,1995
+75,Joker,Crime,2019
+76,Braveheart,Biography,1995
+77,The Boat,Drama,1981
+78,Avengers: Endgame,Action,2019
+79,Princess Mononoke,Animation,1997
+80,Once Upon a Time in America,Crime,1984
+81,Good Will Hunting,Drama,1997
+82,Your Name.,Animation,2016
+83,3 Idiots,Comedy,2009
+84,Singin' in the Rain,Comedy,1952
+85,Requiem for a Dream,Drama,2000
+86,Toy Story 3,Animation,2010
+87,High and Low,Crime,1963
+88,Capernaum,Drama,2018
+89,Star Wars: Episode VI - Return of the Jedi,Action,1983
+90,Eternal Sunshine of the Spotless Mind,Drama,2004
+91,2001: A Space Odyssey,Adventure,1968
+92,Reservoir Dogs,Crime,1992
+93,Come and See,Drama,1985
+94,The Hunt,Drama,2012
+95,Citizen Kane,Drama,1941
+96,M,Crime,1931
+97,Lawrence of Arabia,Adventure,1962
+98,North by Northwest,Action,1959
+99,Vertigo,Mystery,1958
+100,Ikiru,Drama,1952
+101,Amélie,Comedy,2001
+102,The Apartment,Comedy,1960
+103,A Clockwork Orange,Crime,1971
+104,Double Indemnity,Crime,1944
+105,Full Metal Jacket,Drama,1987
+106,Top Gun: Maverick,Action,2022
+107,Scarface,Crime,1983
+108,Hamilton,Biography,2020
+109,Incendies,Drama,2010
+110,To Kill a Mockingbird,Crime,1962
+111,Heat,Action,1995
+112,The Sting,Comedy,1973
+113,Up,Animation,2009
+114,A Separation,Drama,2011
+115,Metropolis,Drama,1927
+116,Taxi Driver,Crime,1976
+117,L.A. Confidential,Crime,1997
+118,Die Hard,Action,1988
+119,Snatch,Comedy,2000
+120,Indiana Jones and the Last Crusade,Action,1989
+121,Bicycle Thieves,Drama,1948
+122,Like Stars on Earth,Drama,2007
+123,1917,Action,2019
+124,Downfall,Biography,2004
+125,Dangal,Action,2016
+126,For a Few Dollars More,Western,1965
+127,Batman Begins,Action,2005
+128,The Kid,Comedy,1921
+129,Some Like It Hot,Comedy,1959
+130,The Father,Drama,2020
+131,All About Eve,Drama,1950
+132,The Wolf of Wall Street,Biography,2013
+133,Green Book,Biography,2018
+134,Judgment at Nuremberg,Drama,1961
+135,Casino,Crime,1995
+136,Ran,Action,1985
+137,Pan's Labyrinth,Drama,2006
+138,The Truman Show,Comedy,1998
+139,There Will Be Blood,Drama,2007
+140,Unforgiven,Drama,1992
+141,The Sixth Sense,Drama,1999
+142,Shutter Island,Mystery,2010
+143,A Beautiful Mind,Biography,2001
+144,Jurassic Park,Action,1993
+145,Yojimbo,Action,1961
+146,The Treasure of the Sierra Madre,Adventure,1948
+147,Monty Python and the Holy Grail,Adventure,1975
+148,The Great Escape,Adventure,1963
+149,No Country for Old Men,Crime,2007
+150,Spider-Man: No Way Home,Action,2021
+151,Kill Bill: Vol. 1,Action,2003
+152,Rashomon,Crime,1950
+153,The Thing,Horror,1982
+154,Finding Nemo,Animation,2003
+155,The Elephant Man,Biography,1980
+156,Chinatown,Drama,1974
+157,Raging Bull,Biography,1980
+158,V for Vendetta,Action,2005
+159,Gone with the Wind,Drama,1939
+160,"Lock, Stock and Two Smoking Barrels",Action,1998
+161,Inside Out,Animation,2015
+162,Dial M for Murder,Crime,1954
+163,The Secret in Their Eyes,Drama,2009
+164,Howl's Moving Castle,Animation,2004
+165,"Three Billboards Outside Ebbing, Missouri",Comedy,2017
+166,The Bridge on the River Kwai,Adventure,1957
+167,Trainspotting,Drama,1996
+168,Prisoners,Crime,2013
+169,Warrior,Action,2011
+170,Fargo,Crime,1996
+171,Gran Torino,Drama,2008
+172,My Neighbor Totoro,Animation,1988
+173,Catch Me If You Can,Biography,2002
+174,Million Dollar Baby,Drama,2004
+175,Children of Heaven,Drama,1997
+176,Blade Runner,Action,1982
+177,The Gold Rush,Adventure,1925
+178,Before Sunrise,Drama,1995
+179,12 Years a Slave,Biography,2013
+180,Klaus,Animation,2019
+181,Harry Potter and the Deathly Hallows: Part 2,Adventure,2011
+182,On the Waterfront,Crime,1954
+183,Ben-Hur,Adventure,1959
+184,Gone Girl,Drama,2014
+185,The Grand Budapest Hotel,Adventure,2014
+186,Wild Strawberries,Drama,1957
+187,The General,Action,1926
+188,The Third Man,Film-Noir,1949
+189,In the Name of the Father,Biography,1993
+190,The Deer Hunter,Drama,1978
+191,Barry Lyndon,Adventure,1975
+192,Hacksaw Ridge,Biography,2016
+193,The Wages of Fear,"Adventure,",1953
+194,Memories of Murder,Crime,2003
+195,Sherlock Jr.,Action,1924
+196,Wild Tales,Comedy,2014
+197,Mr. Smith Goes to Washington,Comedy,1939
+198,Mad Max: Fury Road,Action,2015
+199,The Seventh Seal,Drama,1957
+200,Mary and Max,Animation,2009
+201,How to Train Your Dragon,Animation,2010
+202,Room,Drama,2015
+203,"Monsters, Inc.",Animation,2001
+204,Jaws,Adventure,1975
+205,Dead Poets Society,Comedy,1989
+206,The Big Lebowski,Comedy,1998
+207,Tokyo Story,Drama,1953
+208,The Passion of Joan of Arc,Biography,1928
+209,Hotel Rwanda,Biography,2004
+210,Ford v Ferrari,Action,2019
+211,Rocky,Drama,1976
+212,Platoon,Drama,1986
+213,Ratatouille,Animation,2007
+214,Spotlight,Biography,2015
+215,The Terminator,Action,1984
+216,Logan,Action,2017
+217,Stand by Me,Adventure,1986
+218,Rush,Action,2013
+219,Network,Drama,1976
+220,Into the Wild,Adventure,2007
+221,Before Sunset,Drama,2004
+222,The Wizard of Oz,Adventure,1939
+223,Pather Panchali,Drama,1955
+224,Groundhog Day,Comedy,1993
+225,The Best Years of Our Lives,Drama,1946
+226,The Exorcist,Horror,1973
+227,The Incredibles,Animation,2004
+228,To Be or Not to Be,Comedy,1942
+229,La haine,Crime,1995
+230,The Battle of Algiers,Drama,1966
+231,Pirates of the Caribbean: The Curse of the Black Pearl,Action,2003
+232,Hachi: A Dog's Tale,Biography,2009
+233,The Grapes of Wrath,Drama,1940
+234,Jai Bhim,Crime,2021
+235,My Father and My Son,Drama,2005
+236,Amores Perros,Drama,2000
+237,Rebecca,Drama,1940
+238,Cool Hand Luke,Crime,1967
+239,The Handmaiden,Drama,2016
+240,The 400 Blows,Crime,1959
+241,The Sound of Music,Biography,1965
+242,It Happened One Night,Comedy,1934
+243,Persona,Drama,1966
+244,Life of Brian,Comedy,1979
+245,The Iron Giant,"Animation,",1999
+246,The Help,Drama,2011
+247,Dersu Uzala,Adventure,1975
+248,Aladdin,Animation,1992
+249,Gandhi,Biography,1982
+250,Dances with Wolves,Adventure,1990
