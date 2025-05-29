@@ -72,7 +72,7 @@ def upgrade() -> None:
         gwhId = (
             connection.execute(
                 sa.text(
-                    """
+                """
                 SELECT id 
                 FROM movies
                 WHERE name = 'Good Will Hunting'
@@ -86,7 +86,7 @@ def upgrade() -> None:
         gladiatorId = (
             connection.execute(
                 sa.text(
-                    """
+                """
                 SELECT id 
                 FROM movies
                 WHERE name = 'Gladiator'
