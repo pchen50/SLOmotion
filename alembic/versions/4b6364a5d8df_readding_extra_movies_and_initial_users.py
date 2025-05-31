@@ -5,6 +5,7 @@ Revises: 7c8dc4beba56
 Create Date: 2025-05-28 21:05:12.761049
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -13,8 +14,8 @@ from src import database as db
 
 
 # revision identifiers, used by Alembic.
-revision: str = '4b6364a5d8df'
-down_revision: Union[str, None] = '7c8dc4beba56'
+revision: str = "4b6364a5d8df"
+down_revision: Union[str, None] = "7c8dc4beba56"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -43,36 +44,49 @@ def upgrade() -> None:
 
     aliceId = (
         connect.execute(
-            sa.text("INSERT into users (name, username) VALUES ('Alice', 'aliceMovies') RETURNING id")
+            sa.text(
+                "INSERT into users (name, username) VALUES ('Alice', 'aliceMovies') RETURNING id"
+            )
         )
         .one()
         .id
     )
-    
+
     bobId = (
-        connect.execute(sa.text("INSERT into users (name, username) VALUES ('Bob', 'bobRatings') RETURNING id"))
+        connect.execute(
+            sa.text(
+                "INSERT into users (name, username) VALUES ('Bob', 'bobRatings') RETURNING id"
+            )
+        )
         .one()
         .id
     )
-    
+
     joeId = (
-        connect.execute(sa.text("INSERT into users (name, username) VALUES ('Joe', 'watchWithJoe') RETURNING id"))
+        connect.execute(
+            sa.text(
+                "INSERT into users (name, username) VALUES ('Joe', 'watchWithJoe') RETURNING id"
+            )
+        )
         .one()
         .id
     )
-    
+
     eveId = (
-        connect.execute(sa.text("INSERT into users (name, username) VALUES ('Eve','filmCriticEve') RETURNING id"))
+        connect.execute(
+            sa.text(
+                "INSERT into users (name, username) VALUES ('Eve','filmCriticEve') RETURNING id"
+            )
+        )
         .one()
         .id
     )
-    
 
     with db.engine.begin() as connection:
         gwhId = (
             connection.execute(
                 sa.text(
-                """
+                    """
                 SELECT id 
                 FROM movies
                 WHERE name = 'Good Will Hunting'
@@ -86,7 +100,7 @@ def upgrade() -> None:
         gladiatorId = (
             connection.execute(
                 sa.text(
-                """
+                    """
                 SELECT id 
                 FROM movies
                 WHERE name = 'Gladiator'
@@ -131,7 +145,7 @@ def upgrade() -> None:
             ),
             [{"movie_id": barbieMovie, "user_id": aliceId, "rating": None}],
         )
-        
+
         connect.execute(
             sa.text(
                 "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, 'nice', 6, 'watched')"
@@ -145,14 +159,13 @@ def upgrade() -> None:
             ),
             [{"movie_id": gwhId, "user_id": eveId}],
         )
-        
+
         connect.execute(
             sa.text(
                 "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, 'inspiring', 7, 'watched')"
             ),
             [{"movie_id": barbieMovie, "user_id": eveId}],
         )
-       
 
 
 def downgrade() -> None:

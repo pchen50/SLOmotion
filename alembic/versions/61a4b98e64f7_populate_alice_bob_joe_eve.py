@@ -1,18 +1,13 @@
-"""populate alice,bob,joe,eve
+"""populate alice, bob, joe, eve with movies and ratings
 
 Revision ID: 61a4b98e64f7
 Revises: 34a53ab6d376
 Create Date: 2025-05-10 18:08:41.726936
-
 """
 
 from typing import Sequence, Union
-
 from alembic import op
 import sqlalchemy as sa
-from src import database as db
-import sqlalchemy
-
 
 # revision identifiers, used by Alembic.
 revision: str = "61a4b98e64f7"
@@ -22,252 +17,211 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    """Upgrade schema."""
+    """Upgrade schema by populating users, movies, watchlists, and ratings."""
     connect = op.get_bind()
-    mineMovie = (
-        connect.execute(
-            sa.text(
-                "INSERT into movies (name,genre) VALUES ('A Minecraft Movie', 'Adventure') RETURNING id"
-            )
-        )
-        .one()
-        .id
-    )
-    barbieMovie = (
-        connect.execute(
-            sa.text(
-                "INSERT into movies (name,genre) VALUES ('Barbie', 'Comedy') RETURNING id"
-            )
-        )
-        .one()
-        .id
-    )
 
-    aliceId = (
-        connect.execute(
-            sa.text("INSERT into users (name) VALUES ('Alice') RETURNING id")
-        )
-        .one()
-        .id
-    )
-    aliceWId = (
-        connect.execute(
-            sa.text(
-                "INSERT INTO watchlists (user_id, public) VALUES (:user_id, :public) RETURNING id"
-            ),
-            [{"user_id": aliceId, "public": True}],
-        )
-        .one()
-        .id
-    )
-    bobId = (
-        connect.execute(sa.text("INSERT into users (name) VALUES ('Bob') RETURNING id"))
-        .one()
-        .id
-    )
-    bobWId = (
-        connect.execute(
-            sa.text(
-                "INSERT INTO watchlists (user_id, public) VALUES (:user_id, :public) RETURNING id"
-            ),
-            [{"user_id": bobId, "public": True}],
-        )
-        .one()
-        .id
-    )
-    joeId = (
-        connect.execute(sa.text("INSERT into users (name) VALUES ('Joe') RETURNING id"))
-        .one()
-        .id
-    )
-    joeWId = (
-        connect.execute(
-            sa.text(
-                "INSERT INTO watchlists (user_id, public) VALUES (:user_id, :public) RETURNING id"
-            ),
-            [{"user_id": joeId, "public": True}],
-        )
-        .one()
-        .id
-    )
-    eveId = (
-        connect.execute(sa.text("INSERT into users (name) VALUES ('Eve') RETURNING id"))
-        .one()
-        .id
-    )
-    eveWId = (
-        connect.execute(
-            sa.text(
-                "INSERT INTO watchlists (user_id, public) VALUES (:user_id, :public) RETURNING id"
-            ),
-            [{"user_id": eveId, "public": True}],
-        )
-        .one()
-        .id
-    )
+    # Step 1: Insert movies into the movies table
+    movies = {
+        "A Minecraft Movie": "Adventure",
+        "Barbie": "Comedy",
+        "Good Will Hunting": "Drama",
+        "Gladiator": "Action",
+    }
 
-    with db.engine.begin() as connection:
-        gwhId = (
-            connection.execute(
+    movie_ids = {}
+    for name, genre in movies.items():
+        movie_ids[name] = (
+            connect.execute(
                 sa.text(
-                    """
-                SELECT id 
-                FROM movies
-                WHERE name = 'Good Will Hunting'
-                """
-                )
+                    "INSERT INTO movies (name, genre) VALUES (:name, :genre) RETURNING id"
+                ),
+                {"name": name, "genre": genre},
             )
             .one()
             .id
         )
 
-        gladiatorId = (
-            connection.execute(
+    # Step 2: Create users and associated watchlists
+    users = ["Alice", "Bob", "Joe", "Eve"]
+    user_ids = {}
+    watchlist_ids = {}
+    for user in users:
+        user_ids[user] = (
+            connect.execute(
+                sa.text("INSERT INTO users (name) VALUES (:name) RETURNING id"),
+                {"name": user},
+            )
+            .one()
+            .id
+        )
+        watchlist_ids[user] = (
+            connect.execute(
                 sa.text(
-                    """
-                SELECT id 
-                FROM movies
-                WHERE name = 'Gladiator'
-                """
-                )
+                    "INSERT INTO watchlists (user_id, public) VALUES (:user_id, true) RETURNING id"
+                ),
+                {"user_id": user_ids[user]},
             )
             .one()
             .id
         )
 
-        joeMineId = (
-            connect.execute(
-                sa.text(
-                    "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, '', :rating, 'want to watch') RETURNING id"
-                ),
-                [{"movie_id": mineMovie, "user_id": joeId, "rating": None}],
-            )
-            .one()
-            .id
-        )
-        joeGwhId = (
-            connect.execute(
-                sa.text(
-                    "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, 'amazing cinematography', 5, 'watched') RETURNING id"
-                ),
-                [{"movie_id": gwhId, "user_id": joeId}],
-            )
-            .one()
-            .id
-        )
+    # Step 3: Joe's ratings and watchlist additions
+    joe_id = user_ids["Joe"]
+    joe_watchlist = watchlist_ids["Joe"]
+    joe_minecraft = (
         connect.execute(
-            sa.text(
-                "INSERT into watchlist_movie (watchlist_id, movie_rating_id) VALUES (:watchlist_id, :movie_rating_id)"
-            ),
-            [{"watchlist_id": joeWId, "movie_rating_id": joeMineId}],
+            sa.text("""
+            INSERT INTO movie_ratings (movie_id, user_id, notes, rating, status)
+            VALUES (:movie_id, :user_id, '', NULL, 'want to watch') RETURNING id
+        """),
+            {"movie_id": movie_ids["A Minecraft Movie"], "user_id": joe_id},
         )
+        .one()
+        .id
+    )
+    joe_gwh = (
         connect.execute(
-            sa.text(
-                "INSERT into watchlist_movie (watchlist_id, movie_rating_id) VALUES (:watchlist_id, :movie_rating_id)"
-            ),
-            [{"watchlist_id": joeWId, "movie_rating_id": joeGwhId}],
+            sa.text("""
+            INSERT INTO movie_ratings (movie_id, user_id, notes, rating, status)
+            VALUES (:movie_id, :user_id, 'amazing cinematography', 5, 'watched') RETURNING id
+        """),
+            {"movie_id": movie_ids["Good Will Hunting"], "user_id": joe_id},
         )
+        .one()
+        .id
+    )
 
-        bobGladId = (
-            connect.execute(
-                sa.text(
-                    "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, 'nice', 6, 'watched') RETURNING id"
-                ),
-                [{"movie_id": gladiatorId, "user_id": bobId}],
-            )
-            .one()
-            .id
-        )
-        bobGwhId = (
-            connect.execute(
-                sa.text(
-                    "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, 'really good', 7, 'watched') RETURNING id"
-                ),
-                [{"movie_id": gwhId, "user_id": bobId}],
-            )
-            .one()
-            .id
-        )
-        connect.execute(
-            sa.text(
-                "INSERT into watchlist_movie (watchlist_id, movie_rating_id) VALUES (:watchlist_id, :movie_rating_id)"
-            ),
-            [{"watchlist_id": bobWId, "movie_rating_id": bobGladId}],
-        )
-        connect.execute(
-            sa.text(
-                "INSERT into watchlist_movie (watchlist_id, movie_rating_id) VALUES (:watchlist_id, :movie_rating_id)"
-            ),
-            [{"watchlist_id": bobWId, "movie_rating_id": bobGwhId}],
-        )
+    # Add Joe's ratings to his watchlist
+    connect.execute(
+        sa.text(
+            "INSERT INTO watchlist_movie (watchlist_id, movie_rating_id) VALUES (:wl, :mr)"
+        ),
+        [
+            {"wl": joe_watchlist, "mr": joe_minecraft},
+            {"wl": joe_watchlist, "mr": joe_gwh},
+        ],
+    )
 
-        aliceBarbieId = (
-            connect.execute(
-                sa.text(
-                    "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, '', :rating, 'want to watch') RETURNING id"
-                ),
-                [{"movie_id": barbieMovie, "user_id": aliceId, "rating": None}],
-            )
-            .one()
-            .id
-        )
+    # Step 4: Bob's ratings and watchlist additions
+    bob_id = user_ids["Bob"]
+    bob_watchlist = watchlist_ids["Bob"]
+    bob_glad = (
         connect.execute(
-            sa.text(
-                "INSERT into watchlist_movie (watchlist_id, movie_rating_id) VALUES (:watchlist_id, :movie_rating_id)"
-            ),
-            [{"watchlist_id": aliceWId, "movie_rating_id": aliceBarbieId}],
+            sa.text("""
+            INSERT INTO movie_ratings (movie_id, user_id, notes, rating, status)
+            VALUES (:movie_id, :user_id, 'nice', 6, 'watched') RETURNING id
+        """),
+            {"movie_id": movie_ids["Gladiator"], "user_id": bob_id},
         )
+        .one()
+        .id
+    )
+    bob_gwh = (
+        connect.execute(
+            sa.text("""
+            INSERT INTO movie_ratings (movie_id, user_id, notes, rating, status)
+            VALUES (:movie_id, :user_id, 'really good', 7, 'watched') RETURNING id
+        """),
+            {"movie_id": movie_ids["Good Will Hunting"], "user_id": bob_id},
+        )
+        .one()
+        .id
+    )
 
-        eveGladId = (
-            connect.execute(
-                sa.text(
-                    "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, 'nice', 6, 'watched') RETURNING id"
-                ),
-                [{"movie_id": gladiatorId, "user_id": eveId}],
-            )
-            .one()
-            .id
-        )
-        eveGwhId = (
-            connect.execute(
-                sa.text(
-                    "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, 'enjoyed', 7, 'watched') RETURNING id"
-                ),
-                [{"movie_id": gwhId, "user_id": eveId}],
-            )
-            .one()
-            .id
-        )
+    # Add Bob's ratings to his watchlist
+    connect.execute(
+        sa.text(
+            "INSERT INTO watchlist_movie (watchlist_id, movie_rating_id) VALUES (:wl, :mr)"
+        ),
+        [{"wl": bob_watchlist, "mr": bob_glad}, {"wl": bob_watchlist, "mr": bob_gwh}],
+    )
+
+    # Step 5: Alice's rating and watchlist addition
+    alice_id = user_ids["Alice"]
+    alice_watchlist = watchlist_ids["Alice"]
+    alice_barbie = (
         connect.execute(
-            sa.text(
-                "INSERT into watchlist_movie (watchlist_id, movie_rating_id) VALUES (:watchlist_id, :movie_rating_id)"
-            ),
-            [{"watchlist_id": eveWId, "movie_rating_id": eveGladId}],
+            sa.text("""
+            INSERT INTO movie_ratings (movie_id, user_id, notes, rating, status)
+            VALUES (:movie_id, :user_id, '', NULL, 'want to watch') RETURNING id
+        """),
+            {"movie_id": movie_ids["Barbie"], "user_id": alice_id},
         )
+        .one()
+        .id
+    )
+
+    # Add Alice's rating to her watchlist
+    connect.execute(
+        sa.text(
+            "INSERT INTO watchlist_movie (watchlist_id, movie_rating_id) VALUES (:wl, :mr)"
+        ),
+        {"wl": alice_watchlist, "mr": alice_barbie},
+    )
+
+    # Step 6: Eve's ratings and watchlist additions
+    eve_id = user_ids["Eve"]
+    eve_watchlist = watchlist_ids["Eve"]
+    eve_glad = (
         connect.execute(
-            sa.text(
-                "INSERT into watchlist_movie (watchlist_id, movie_rating_id) VALUES (:watchlist_id, :movie_rating_id)"
-            ),
-            [{"watchlist_id": eveWId, "movie_rating_id": eveGwhId}],
+            sa.text("""
+            INSERT INTO movie_ratings (movie_id, user_id, notes, rating, status)
+            VALUES (:movie_id, :user_id, 'nice', 6, 'watched') RETURNING id
+        """),
+            {"movie_id": movie_ids["Gladiator"], "user_id": eve_id},
         )
-        eveBarbieId = (
-            connect.execute(
-                sa.text(
-                    "INSERT into movie_ratings (movie_id,user_id,notes,rating,status) VALUES (:movie_id, :user_id, 'inspiring', 7, 'watched') RETURNING id"
-                ),
-                [{"movie_id": barbieMovie, "user_id": eveId}],
-            )
-            .one()
-            .id
-        )
+        .one()
+        .id
+    )
+    eve_gwh = (
         connect.execute(
-            sa.text(
-                "INSERT into watchlist_movie (watchlist_id, movie_rating_id) VALUES (:watchlist_id, :movie_rating_id)"
-            ),
-            [{"watchlist_id": eveWId, "movie_rating_id": eveBarbieId}],
+            sa.text("""
+            INSERT INTO movie_ratings (movie_id, user_id, notes, rating, status)
+            VALUES (:movie_id, :user_id, 'enjoyed', 7, 'watched') RETURNING id
+        """),
+            {"movie_id": movie_ids["Good Will Hunting"], "user_id": eve_id},
         )
+        .one()
+        .id
+    )
+    eve_barbie = (
+        connect.execute(
+            sa.text("""
+            INSERT INTO movie_ratings (movie_id, user_id, notes, rating, status)
+            VALUES (:movie_id, :user_id, 'inspiring', 7, 'watched') RETURNING id
+        """),
+            {"movie_id": movie_ids["Barbie"], "user_id": eve_id},
+        )
+        .one()
+        .id
+    )
+
+    # Add Eve's ratings to her watchlist
+    connect.execute(
+        sa.text(
+            "INSERT INTO watchlist_movie (watchlist_id, movie_rating_id) VALUES (:wl, :mr)"
+        ),
+        [
+            {"wl": eve_watchlist, "mr": eve_glad},
+            {"wl": eve_watchlist, "mr": eve_gwh},
+            {"wl": eve_watchlist, "mr": eve_barbie},
+        ],
+    )
 
 
 def downgrade() -> None:
-    """Downgrade schema."""
-    pass
+    """Downgrade schema by removing inserted users, movies, and related entries."""
+    connect = op.get_bind()
+
+    # Remove all data related to this migration
+    connect.execute(sa.text("DELETE FROM watchlist_movie"))
+    connect.execute(sa.text("DELETE FROM movie_ratings"))
+    connect.execute(sa.text("DELETE FROM watchlists"))
+    connect.execute(
+        sa.text("DELETE FROM users WHERE name IN ('Alice', 'Bob', 'Joe', 'Eve')")
+    )
+    connect.execute(
+        sa.text(
+            "DELETE FROM movies WHERE name IN ('A Minecraft Movie', 'Barbie', 'Good Will Hunting', 'Gladiator')"
+        )
+    )
