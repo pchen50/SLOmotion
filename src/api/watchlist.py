@@ -13,7 +13,7 @@ router = APIRouter(
 
 
 class WatchlistMovie(BaseModel):
-    watchlist_id: int
+    user_id: int
     movie_id: int
     name: str
     status: str
@@ -117,36 +117,16 @@ def get_user_stats(user_id: int):
 def get_watched(user_id: int) -> List[WatchedMovie]:
     print(user_id)
     with db.engine.begin() as connection:
-        row = connection.execute(
-            sqlalchemy.text(
-                """ 
-                    SELECT id, public
-                    FROM watchlists
-                    WHERE user_id = :user_id
-                """
-            ),
-            [{"user_id": user_id}],
-        ).one_or_none()
-        if row is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User doesn't exist",
-            )
-        watchlist_id = row.id
-        print(row)
-        # Then from that get all the movie_rating ids associated with watchlist id
-        print(watchlist_id)
         result = connection.execute(
             sqlalchemy.text(
                 """
-                    SELECT watchlist_id, movies.id as movie_id, movies.name as name, movie_ratings.status as status, movie_ratings.rating as rating, movies.genre as genre
-                    FROM watchlist_movie
-                    JOIN movie_ratings on watchlist_movie.movie_rating_id = movie_ratings.id
+                    SELECT movie_id, movies.name as name, movie_ratings.status as status, movie_ratings.rating as rating, movies.genre as genre
+                    FROM movie_ratings
                     JOIN movies on movie_ratings.movie_id = movies.id
-                    WHERE watchlist_id = :watchlist_id and status = 'watched'
+                    WHERE user_id = :user_id and status = 'watched'
                 """
             ),
-            [{"watchlist_id": watchlist_id}],
+            [{"user_id": user_id}],
         ).tuples()
         # for all movie rating ids return the movie_rating, movie_ids, and their names
         watched_movies = []
@@ -168,43 +148,24 @@ def get_watched(user_id: int) -> List[WatchedMovie]:
 def get_watchlist_movies(
     user_id: int,
 ) -> List[WatchlistMovie]:  # return list of movies on user's watchlist
-    # get their watchlist id from watchlists?
     with db.engine.begin() as connection:
-        row = connection.execute(
+        result = connection.execute(
             sqlalchemy.text(
-                """ 
-                    SELECT id, public
-                    FROM watchlists
+                """
+                    SELECT movies.id as movie_id, movies.name as name, status
+                    FROM movie_ratings
+                    JOIN movies on movie_ratings.movie_id = movies.id
                     WHERE user_id = :user_id
                 """
             ),
             [{"user_id": user_id}],
-        ).one_or_none()
-        if row is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User doesn't exist",
-            )
-        watchlist_id = row.id
-        # Then from that get all the movie_rating ids associated with watchlist id
-        result = connection.execute(
-            sqlalchemy.text(
-                """
-                    SELECT watchlist_id, movies.id as movie_id, movies.name as name, status
-                    FROM watchlist_movie
-                    JOIN movie_ratings on watchlist_movie.movie_rating_id = movie_ratings.id
-                    JOIN movies on movie_ratings.movie_id = movies.id
-                    WHERE watchlist_id = :watchlist_id
-                """
-            ),
-            [{"watchlist_id": watchlist_id}],
         ).tuples()
         # for all movie rating ids return the movie_rating, movie_ids, and their names
         watchlist_movies = []
         for movie in result:
             watchlist_movies.append(
                 WatchlistMovie(
-                    watchlist_id=movie.watchlist_id,
+                    user_id=user_id,
                     movie_id=movie.movie_id,
                     name=movie.name,
                     status=movie.status,
@@ -323,7 +284,7 @@ def update_watchlist_movie_entry(user_id: int, movie_id: int, update: MovieRatin
 
 @router.post("/{user_id}/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
 def post_movie_onto_watchlist(user_id: int, movie_id: int, movie: AddToWatchlist):
-    # posts in watchlist movie and movie ratings but in movie ratings it won't have rating or notes?
+    # posts in movie ratings but in movie ratings it won't have rating or notes?
 
     # check if movie already exists in watchlist
     with db.engine.begin() as connection:
@@ -362,37 +323,12 @@ def post_movie_onto_watchlist(user_id: int, movie_id: int, movie: AddToWatchlist
             },
         )
 
-        movie_rating_id = result.scalar()
-
-        # get the watchlist id for the user
-        watchlist = connection.execute(
-            sqlalchemy.text(
-                """
-                SELECT id
-                FROM watchlists
-                WHERE user_id = :user_id
-                """
-            ),
-            {"user_id": user_id},
-        ).one()
-
-        # insert into watchlist_movie table
-        connection.execute(
-            sqlalchemy.text(
-                """
-                INSERT INTO watchlist_movie (watchlist_id, movie_rating_id)
-                VALUES (:watchlist_id, :movie_rating_id)
-                """
-            ),
-            {"watchlist_id": watchlist.id, "movie_rating_id": movie_rating_id},
-        )
-
     return {"message": "Successfully added movie to watchlist."}
 
 
 @router.delete("/{user_id}/{movie_id}", status_code=status.HTTP_200_OK)
 def delete_users_movie_entry(user_id: int, movie_id: int):
-    # delete from movie ratings, watchlist movies, and any comments on it
+    # delete from movie ratings, and any comments on it
 
     # gets movie rating id from movie ratings table
     with db.engine.begin() as connection:
@@ -426,16 +362,6 @@ def delete_users_movie_entry(user_id: int, movie_id: int):
             {"user_id": user_id, "movie_id": movie_id},
         )
 
-        # delete from watchlist_movie table
-        connection.execute(
-            sqlalchemy.text(
-                """
-                DELETE FROM watchlist_movie
-                WHERE movie_rating_id = :movie_rating_id
-                """
-            ),
-            {"movie_rating_id": movie_rating_id},
-        )
 
         # delete from movie ratings table
         connection.execute(
