@@ -32,7 +32,7 @@ class MovieRating(BaseModel):
 
 class WatchedMovie(BaseModel):
     movie_id: int
-    title: str
+    name: str
     status: str
     rating: int
     genre: str
@@ -154,7 +154,7 @@ def get_watched(user_id: int) -> List[WatchedMovie]:
             watched_movies.append(
                 WatchedMovie(
                     movie_id=movie.movie_id,
-                    title=movie.name,
+                    name=movie.name,
                     status=movie.status,
                     rating=movie.rating,
                     genre=movie.genre,
