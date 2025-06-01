@@ -5,6 +5,8 @@ import sqlalchemy
 from src.api import auth
 from src import database as db
 from sqlalchemy.exc import IntegrityError
+from pydantic import Field
+
 
 router = APIRouter(
     prefix="/watchlist",
@@ -37,7 +39,11 @@ class WatchedMovie(BaseModel):
 
 
 class AddToWatchlist(BaseModel):
-    rating: int | None = None
+    # ge = greater than or equal to
+    # le = less than or equal to
+    rating: int | None = Field(
+        default=None, ge=1, le=10, description="Rating must be between 1 and 10."
+    )
     notes: str | None = None
     status: Literal["watched", "want to watch", "watching"]
 
@@ -62,6 +68,12 @@ class MovieRatingUpdate(BaseModel):
     notes: str | None = Field(None, example=None)
     rating: int | None = None
     status: Literal["watched", "want to watch", "watching"] | None = None
+
+
+class Comment(BaseModel):
+    commenter_user_id: int
+    commenter_username: str
+    comment_text: str
 
 
 @router.get("/{user_id}/stats", response_model=WatchlistStats)
@@ -279,11 +291,11 @@ def update_watchlist_movie_entry(
         fields.append("notes = :notes")
         values["notes"] = update.notes
     if update.rating is not None:
-        fields.append("rating = :rating")
         values["rating"] = update.rating
+        fields.append("rating = :rating")
     if update.status is not None:
-        fields.append("status = :status")
         values["status"] = update.status
+        fields.append("status = :status")
 
     if not fields:
         raise HTTPException(
@@ -292,6 +304,19 @@ def update_watchlist_movie_entry(
         )
 
     with db.engine.begin() as connection:
+        # check if user exists first
+        user_exists = connection.execute(
+            sqlalchemy.text("SELECT id FROM users WHERE id = :user_id"),
+            {"user_id": user_id},
+        ).one_or_none()
+
+        if user_exists is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User with this ID does not exist.",
+            )
+
+        # proceed with the update
         result = connection.execute(
             sqlalchemy.text(
                 f"""
@@ -405,3 +430,32 @@ def delete_users_movie_entry(user_id: int, movie_id: int):
         )
 
     return {"message": "Successfully removed movie."}
+
+
+@router.get("/{user_id}/{movie_id}/comments", response_model=List[Comment])
+def get_comments(user_id: int, movie_id: int):
+    # get the commenters user id, their username, and the comment text
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT c.commenter_user_id, u.username AS commenter_username, c.comment_text
+                FROM comments c
+                JOIN users u ON c.commenter_user_id = u.id
+                WHERE c.user_id = :user_id AND c.movie_id = :movie_id
+                ORDER BY c.id DESC
+                """
+            ),
+            {"user_id": user_id, "movie_id": movie_id},
+        ).fetchall()
+
+        # return the list of comments as comment models
+        # each user can only leave one comment on a movie so there are no repeats
+        return [
+            Comment(
+                commenter_user_id=row.commenter_user_id,
+                commenter_username=row.commenter_username,
+                comment_text=row.comment_text,
+            )
+            for row in result
+        ]
