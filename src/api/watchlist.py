@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, status, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Literal
 import sqlalchemy
 from src.api import auth
 from src import database as db
+from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(
     prefix="/watchlist",
@@ -55,6 +56,12 @@ class WatchlistStats(BaseModel):
     totalGenres: dict[str, str]
     recentNotes: RecentNotes
     averageRating: float
+
+
+class MovieRatingUpdate(BaseModel):
+    notes: str | None = Field(None, example=None)
+    rating: int | None = None
+    status: Literal["watched", "want to watch", "watching"] | None = None
 
 
 @router.get("/{user_id}/stats", response_model=WatchlistStats)
@@ -234,55 +241,79 @@ def post_comment_on_movie_rating(
             )
 
         # insert comment
-        connection.execute(
-            sqlalchemy.text(
-                """
-            INSERT INTO comments (commenter_user_id, user_id, movie_id, comment_text)
-            VALUES (:commenter_user_id, :user_id, :movie_id, :comment_text)
-            """
-            ),
-            {
-                "commenter_user_id": user2_id,
-                "user_id": user_id,
-                "movie_id": movie_id,
-                "comment_text": comment.comment_text,
-            },
-        )
+        try:
+            connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO comments (commenter_user_id, user_id, movie_id, comment_text)
+                    VALUES (:commenter_user_id, :user_id, :movie_id, :comment_text)
+                    """
+                ),
+                {
+                    "commenter_user_id": user2_id,
+                    "user_id": user_id,
+                    "movie_id": movie_id,
+                    "comment_text": comment.comment_text,
+                },
+            )
+        except IntegrityError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A comment from this user already exists on this rating.",
+            )
 
     return {"message": "Comment added."}
 
 
 @router.patch("/{user_id}/{movie_id}", status_code=status.HTTP_200_OK)
-def update_watchlist_movie_entry(user_id: int, movie_id: int, update: MovieRating):
+def update_watchlist_movie_entry(
+    user_id: int, movie_id: int, update: MovieRatingUpdate
+):
     # Updates a user's description/rating for a movie in their watchlist
+    # add null in request body to not update a field
+
+    fields = []
+    values = {"user_id": user_id, "movie_id": movie_id}
+
+    if update.notes is not None:
+        fields.append("notes = :notes")
+        values["notes"] = update.notes
+    if update.rating is not None:
+        fields.append("rating = :rating")
+        values["rating"] = update.rating
+    if update.status is not None:
+        fields.append("status = :status")
+        values["status"] = update.status
+
+    if not fields:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields to update provided.",
+        )
 
     with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
-                """
+                f"""
                 UPDATE movie_ratings
-                SET notes = :notes, rating = :rating, status = :status
-                WHERE user_id = :user_id AND movie_id = :movie_id"""
+                SET {", ".join(fields)}
+                WHERE user_id = :user_id AND movie_id = :movie_id
+                RETURNING id
+                """
             ),
-            {
-                "user_id": user_id,
-                "movie_id": movie_id,
-                "notes": update.notes,
-                "rating": update.rating,
-                "status": update.status,
-            },
+            values,
         )
 
         if result.rowcount == 0:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Movie rating not found for this user.",
+                detail="Movie rating not found for this user and movie.",
             )
 
     return {"message": "Successfully updated!"}
 
 
-@router.post("/{user_id}/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/{user_id}/{movie_id}", status_code=status.HTTP_201_CREATED)
 def post_movie_onto_watchlist(user_id: int, movie_id: int, movie: AddToWatchlist):
     # posts in movie ratings but in movie ratings it won't have rating or notes?
 
@@ -306,7 +337,7 @@ def post_movie_onto_watchlist(user_id: int, movie_id: int, movie: AddToWatchlist
             )
 
         # if it doesn't exist, insert into movie ratings table
-        result = connection.execute(
+        connection.execute(
             sqlalchemy.text(
                 """
                 INSERT INTO movie_ratings (user_id, movie_id, notes, rating, status)
@@ -361,7 +392,6 @@ def delete_users_movie_entry(user_id: int, movie_id: int):
             ),
             {"user_id": user_id, "movie_id": movie_id},
         )
-
 
         # delete from movie ratings table
         connection.execute(

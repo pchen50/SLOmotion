@@ -50,7 +50,7 @@ def create_user(new_cart: Customer):
             if user_id is None:
                 raise HTTPException(status_code=500, detail="Failed to create user")
 
-            return UserCreateResponse(user_id=int(user_id))
+            return UserCreateResponse(user_id=user_id)
 
     # handle cases where username already exists
     except sqlalchemy.exc.IntegrityError:
@@ -79,7 +79,7 @@ def get_user_by_username(username: str):
         return UserCreateResponse(user_id=result.id)
 
 
-# new end point for login to return name nad username from user id
+# new end point for login to return name and username from user id
 @router.get("/login/{user_id}", response_model=UserInfo)
 def login_user(user_id: int):
     with db.engine.connect() as connection:

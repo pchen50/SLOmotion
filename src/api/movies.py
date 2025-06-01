@@ -16,6 +16,7 @@ class Rating(BaseModel):
     user_id: int
     rating: int | None
 
+
 class MovieId(BaseModel):
     movie_id: int
 
@@ -26,13 +27,13 @@ def get_movie_id(movie_name: str, year: int = None):
     movies = sqlalchemy.Table("movies", metadata_obj, autoload_with=db.engine)
     stmt = sqlalchemy.select(movies.c.id).select_from(movies)
     if year:
-        stmt = stmt.where((movies.c.name.ilike(f'{movie_name}')),(movies.c.year==year))
+        stmt = stmt.where(
+            (movies.c.name.ilike(f"{movie_name}")), (movies.c.year == year)
+        )
     else:
-        stmt = stmt.where((movies.c.name.ilike(f'{movie_name}')))
+        stmt = stmt.where((movies.c.name.ilike(f"{movie_name}")))
     with db.engine.connect() as connection:
-        id = connection.execute(
-            stmt
-        ).one_or_none()
+        id = connection.execute(stmt).one_or_none()
 
         if id is None:
             raise HTTPException(
