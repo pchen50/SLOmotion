@@ -38,7 +38,7 @@ def get_movie_id(movie_name: str, year: int = None):
         if not results:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Movie name not spelled correctly or not in IMDb top 250 list",
+                detail="Movie not found in database. Please check the spelling and try again.",
             )
         
         if len(results) > 1:

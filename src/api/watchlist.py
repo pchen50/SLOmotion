@@ -78,7 +78,7 @@ class Comment(BaseModel):
 
 @router.get("/{user_id}/stats", response_model=WatchlistStats)
 def get_user_stats(user_id: int):
-    print(user_id)
+    print(user_id)       # should this be removed?      
     with db.engine.begin() as connection:
         movies = connection.execute(
             sqlalchemy.text(
@@ -134,7 +134,7 @@ def get_user_stats(user_id: int):
 
 @router.get("/{user_id}/watched", response_model=List[WatchedMovie])
 def get_watched(user_id: int) -> List[WatchedMovie]:
-    print(user_id)
+    print(user_id)       # should this be removed?
     with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
@@ -150,7 +150,7 @@ def get_watched(user_id: int) -> List[WatchedMovie]:
         # for all movie rating ids return the movie_rating, movie_ids, and their names
         watched_movies = []
         for movie in result:
-            print(movie)
+            print(movie)            # should this be removed?
             watched_movies.append(
                 WatchedMovie(
                     movie_id=movie.movie_id,
