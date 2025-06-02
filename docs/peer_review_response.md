@@ -67,13 +67,28 @@
 
 - deleted watchlist and watchlist_movies tables
 
-
-
 ---
 
 ## Feedback 3: Sameer Nadeem
 ### Code Review
-- 
+- Users.py
+  - get_users() endpoint returns users with their IDs and names
+  - /users/login/{user_id} endpoint is implemented at /user/login/{user_id} path
+  - removed redundant integer casting of user_id
+ 
+- Watchlist.py
+  - debugging print statements removed
+  - duplicate getting watchlist ID helper function not implemented, unnecessary
+  - status values are string based still, change to integer based key values was not necessary
+
+ - Movies.py
+   - error messages in get_movies was updated to be clearer
+   - movie_id is consistently used as an int across codebase
+   - GET /movies/{movie_name} now returns proper JSON with movie_id key
+  
+- Recommended.py
+  - get_recommend_movies function uses efficient SQL query with GROUP BY and COUNT to find most common genre in database
+
 ### Schema/API Design
 - movie table
     -  GET /movies/{movie_name} now returns proper JSON with "movie_id" key
