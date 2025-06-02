@@ -51,7 +51,21 @@
   - Authentication is properly implemented using API key headers
   
 ### Schema/API Design
-- 
+- movie table
+    - standarized movie_id consistently
+    - Added proper JSON response formatting for endpoints
+    - Added more detailed error messages and fixed issues with certain messages
+- users table
+    - Added GET /users/users endpoint to list all users with IDs and names
+    - username field has a unique constraint 
+- Comments Table
+    - comments are linked to both movie and user for each rating
+    - added error handling for comment endpoints
+- Movie_ratings table
+    - removed duplicate user_id and movie_id from request body
+    - the movie_ratings table has standarized status values
+
+
 
 ---
 
