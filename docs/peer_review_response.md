@@ -31,7 +31,25 @@
 
 ## Feedback 2: Megan Robinson
 ### Code Review
-- 
+- Users.py
+  - the get_users() endpoint returns all users with their IDs and names
+  - The /users/login/{user_id} endpoint is implemented but at /user/login/{user_id} path
+ 
+- Watchlist.py
+  - The public/priate watchlist control is public to simplify the API and user experience
+  - The debugging print statements have been removed
+
+ - Movies.py
+  - The error message in get_movies was updated.
+  - The movie_id is consistently used as an integer type across all endpoints
+
+- Health.py
+  - the /health endpoint is implemented with proper database connectivity checks and table existence verification
+
+- Auth.py
+  - API key print statement has been removed to prevent security issues
+  - Authentication is properly implemented using API key headers
+  
 ### Schema/API Design
 - 
 
