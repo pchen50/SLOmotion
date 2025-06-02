@@ -26,7 +26,7 @@ class MovieRating(BaseModel):
     movie_id: int
     user_id: int
     notes: str
-    rating: int | None = None
+    rating: float | None = None
     status: Literal["watched", "want to watch", "watching"]
 
 
@@ -34,7 +34,7 @@ class WatchedMovie(BaseModel):
     movie_id: int
     name: str
     status: str
-    rating: int
+    rating: float
     genre: str
 
 
