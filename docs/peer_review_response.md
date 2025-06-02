@@ -40,8 +40,8 @@
   - The debugging print statements have been removed
 
  - Movies.py
-  - The error message in get_movies was updated.
-  - The movie_id is consistently used as an integer type across all endpoints
+   - The error message in get_movies was updated.
+   - The movie_id is consistently used as an integer type across all endpoints
 
 - Health.py
   - the /health endpoint is implemented with proper database connectivity checks and table existence verification
