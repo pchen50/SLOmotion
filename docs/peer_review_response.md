@@ -14,17 +14,21 @@
 ### Schema/API Design
 - movie table
     - added a year column to the movies table to help with differentiating between movies that have the same name and genre
+      
 - users table
     - added a username column to the users table and set a uniqueness constraint on this column so that there the user id isn't the only way to differentiate users
+      
 - Comments Table
     - added foreign key constraint on commenter_user_id column
     - added uniqueness constraint to commenter_user_id, user_id, movie_id
     - edited all columns to ensure none were nullable
     - since there is no endpoint to delete users or movies did not set up on delete cascade for any foreign key references
+    
 - Movie_ratings table
     - changed ratings to be float instead of integers
     - added uniqueness constraint on (movie_id, user_id)
     - made sure movie_id and user_id are not nullable
+      
 - deleted watchlists and watchlist_movies table
 
 ---
@@ -55,12 +59,15 @@
     - standarized movie_id consistently
     - Added proper JSON response formatting for endpoints
     - Added more detailed error messages and fixed issues with certain messages
+      
 - users table
     - Added GET /users/users endpoint to list all users with IDs and names
-    - username field has a unique constraint 
+    - username field has a unique constraint
+      
 - Comments Table
     - comments are linked to both movie and user for each rating
     - added error handling for comment endpoints
+      
 - Movie_ratings table
     - removed duplicate user_id and movie_id from request body
     - the movie_ratings table has standarized status values
@@ -93,14 +100,18 @@
 - movie table
     -  GET /movies/{movie_name} now returns proper JSON with "movie_id" key
     -  don't need an additional movie detail endpoint as it would be too much effort to implement
+    - 
 - users table
     - added GET /user/users endpoint to list all users with their IDs and names
     - standardized to use user_id consistently across all endpoints
+      
 - Comments Table
     - added a GET comments endpoint
     - comments are linked to movie and user
+      
 - Movie_ratings table
     - Fixed PATCH endpoint to check user existence
     - removed user_id and movie_id duplicates
     - uses rating validation (1-10)
+      
 - deleted watchlist and watchlist_movies tables
