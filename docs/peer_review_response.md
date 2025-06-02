@@ -65,6 +65,8 @@
     - removed duplicate user_id and movie_id from request body
     - the movie_ratings table has standarized status values
 
+- deleted watchlist and watchlist_movies tables
+
 
 
 ---
@@ -73,4 +75,17 @@
 ### Code Review
 - 
 ### Schema/API Design
+- movie table
+    -  GET /movies/{movie_name} now returns proper JSON with "movie_id" key
+    -  don't need an additional movie detail endpoint as it would be too much effort to implement
+- users table
+    - added GET /user/users endpoint to list all users with their IDs and names
+    - standardized to use user_id consistently across all endpoints
+- Comments Table
+    - added a GET comments endpoint
+    - comments are linked to movie and user
+- Movie_ratings table
+    - Fixed PATCH endpoint to check user existence
+    - removed user_id and movie_id duplicates
+    - uses rating validation (1-10)
 - deleted watchlist and watchlist_movies tables
