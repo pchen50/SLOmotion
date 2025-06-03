@@ -115,8 +115,7 @@ This took 40 ms
 DELETE FROM movie_ratings
 WHERE id = 439826 (this is the movie rating id that we got from the first select query)
 ```
-This took 4 ms
-Overall the whole endpoint took 47 ms
+This took 4 ms. Overall the whole endpoint took 47 ms
 
 ## endpoint 11 POST /watchlist/{user_id}/{movie_id}/{user2_id}/comment post a comment onto a existing movie rating
 This also has 2 queries
@@ -130,8 +129,7 @@ This took 2 ms
 INSERT INTO comments (commenter_user_id, user_id, movie_id, comment_text)
 VALUES (38, 122, 2396, 'whole heartedly agree with you')
 ```
-This took 18 ms
-Overall the whole endpoint took 20 ms
+This took 18 ms. Overall the whole endpoint took 20 ms
 
 ## endpoint 12 GET /watchlist/{user_id}/{movie_id}/comments get the comments on a movie rating
 ```sql
@@ -185,12 +183,14 @@ SELECT user_id, rating
 FROM movie_ratings
 WHERE movie_id = 12
 ```
-This tok 11 ms
+This took 11 ms
 
-# Slowest endpoint
-The slowest endpoint was endpoint 13 which had two queries that each took around 30 ms to complete
+# Slowest endpoints
+1. The slowest endpoint was endpoint 13 which had two queries that each took around 30 ms to complete.
+1. The second slowest endpoint was endpoint 10 which took 47 ms.
+1. The third slowest endpoint was endpoing 12 which took 36 ms. 
+
 ## explain queries
-
 
 ### second query
 (We optimized the second query of the endpoint first which is why it is shown first here)
