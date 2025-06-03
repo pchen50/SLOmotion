@@ -187,10 +187,98 @@ WHERE movie_id = 12
 ```
 This tok 11 ms
 
-### Slowest endpoint
+# Slowest endpoint
 The slowest endpoint was endpoint 13 which had two queries that each took around 30 ms to complete
 ## explain queries
-Running explain queries
+
+
+### second query
+(We optimized the second query of the endpoint first which is why it is shown first here)
+```sql
+EXPLAIN ANALYZE
+SELECT m.id AS movie_id, m.name, m.genre
+FROM movies m
+WHERE m.genre = 'consumer'
+AND m.id NOT IN (
+    SELECT movie_id
+    FROM movie_ratings
+    WHERE user_id = 1343
+)
+ORDER BY RANDOM()
+LIMIT 5
+```
+### Query plan
+```
+Limit  (cost=9830.42..9830.43 rows=5 width=34) (actual time=24.886..24.887 rows=5 loops=1)
+  ->  Sort  (cost=9830.42..9830.43 rows=5 width=34) (actual time=24.884..24.885 rows=5 loops=1)
+        Sort Key: (random())
+        Sort Method: top-N heapsort  Memory: 25kB
+        ->  Seq Scan on movies m  (cost=9603.35..9830.36 rows=5 width=34) (actual time=23.307..24.761 rows=12 loops=1)
+"              Filter: ((NOT (ANY (id = (hashed SubPlan 1).col1))) AND ((genre)::text = 'consumer'::text))"
+              Rows Removed by Filter: 9988
+              SubPlan 1
+                ->  Index Only Scan using movie_ratings_movie_id_user_id_key on movie_ratings  (cost=0.42..9603.30 rows=19 width=4) (actual time=0.625..22.887 rows=17 loops=1)
+                      Index Cond: (user_id = 1343)
+                      Heap Fetches: 0
+Planning Time: 0.968 ms
+Execution Time: 25.064 ms
+```
+
+Looking at this it's looking like this is doing a sequential scan on all 10,000 movies in the database. Given that we want to only be selecting at random from the movies that match the given genre, we should create an index by genre for the movies table.
+
+creating the index:
+```sql 
+CREATE INDEX movies_genre_idx ON movies (genre)
+```
+
+rerunning explain analyze:
+```
+Limit  (cost=9647.88..9647.89 rows=5 width=34) (actual time=24.470..24.472 rows=5 loops=1)
+  ->  Sort  (cost=9647.88..9647.89 rows=5 width=34) (actual time=24.469..24.469 rows=5 loops=1)
+        Sort Key: (random())
+        Sort Method: top-N heapsort  Memory: 25kB
+        ->  Index Scan using movies_genre_idx on movies m  (cost=9603.63..9647.82 rows=5 width=34) (actual time=24.427..24.444 rows=12 loops=1)
+"              Index Cond: ((genre)::text = 'consumer'::text)"
+              Filter: (NOT (ANY (id = (hashed SubPlan 1).col1)))
+              Rows Removed by Filter: 1
+              SubPlan 1
+                ->  Index Only Scan using movie_ratings_movie_id_user_id_key on movie_ratings  (cost=0.42..9603.30 rows=19 width=4) (actual time=0.557..23.762 rows=17 loops=1)
+                      Index Cond: (user_id = 1343)
+                      Heap Fetches: 0
+Planning Time: 1.144 ms
+Execution Time: 24.652 ms
+```
+
+This did not decrease the execution time as much as we had hoped. Another thing that stands out is the subplan which is using an index on both movie_id and user_id. It might be faster if instead the index was jsut on the user_id itself in the movie_ratings table which would help with filtering out movies of that genre that the user has already watched since we won't know ahead of time those movie_ids.
+
+Creating an index on user_id: 
+```sql 
+CREATE INDEX movie_ratings_user_idx ON movie_ratings (user_id)
+```
+
+rerunning explain analyze:
+```
+Limit  (cost=42.58..42.60 rows=5 width=34) (actual time=0.836..0.837 rows=5 loops=1)
+  ->  Sort  (cost=42.58..42.60 rows=5 width=34) (actual time=0.835..0.836 rows=5 loops=1)
+        Sort Key: (random())
+        Sort Method: top-N heapsort  Memory: 25kB
+        ->  Bitmap Heap Scan on movies m  (cost=13.17..42.52 rows=5 width=34) (actual time=0.613..0.676 rows=12 loops=1)
+"              Recheck Cond: ((genre)::text = 'consumer'::text)"
+              Filter: (NOT (ANY (id = (hashed SubPlan 1).col1)))
+              Rows Removed by Filter: 1
+              Heap Blocks: exact=11
+              ->  Bitmap Index Scan on movies_genre_idx  (cost=0.00..4.36 rows=10 width=0) (actual time=0.085..0.086 rows=13 loops=1)
+"                    Index Cond: ((genre)::text = 'consumer'::text)"
+              SubPlan 1
+                ->  Index Scan using movie_ratings_user_idx on movie_ratings  (cost=0.42..8.76 rows=19 width=4) (actual time=0.420..0.423 rows=17 loops=1)
+                      Index Cond: (user_id = 1343)
+Planning Time: 0.955 ms
+Execution Time: 1.296 ms
+```
+This significantly dropped down the execution time (over 20 milliseconds) and is now at a much more reasonable time for finding movies in a particular genre that aren't already on the user's watchlist.
+
+## first query
+Running explain query; this explain analyze was done before the indexes were added to fix the second query above.
 ```sql
 EXPLAIN ANALYZE
 SELECT m.genre
@@ -201,7 +289,7 @@ GROUP BY m.genre
 ORDER BY COUNT(*) DESC
 LIMIT 1
 ```
-# Query plan
+## Query plan
 ```
 Limit  (cost=9737.88..9737.88 rows=1 width=14) (actual time=22.982..22.983 rows=1 loops=1)
   ->  Sort  (cost=9737.88..9737.93 rows=19 width=14) (actual time=22.981..22.982 rows=1 loops=1)
@@ -221,33 +309,25 @@ Limit  (cost=9737.88..9737.88 rows=1 width=14) (actual time=22.982..22.983 rows=
 Planning Time: 1.873 ms
 Execution Time: 23.188 ms
 ```
+Looking at this, the index scan on movie_ratings was using both the user_id and movie_id. However this would prove to be useless since there are no movie_ids provided. After we implemented the index on user_id on movies, this dropped the time for this query as well.
 
-```sql
-EXPLAIN ANALYZE
-SELECT m.id AS movie_id, m.name, m.genre
-FROM movies m
-WHERE m.genre = 'consumer'
-AND m.id NOT IN (
-    SELECT movie_id
-    FROM movie_ratings
-    WHERE user_id = 1343
-)
-ORDER BY RANDOM()
-LIMIT 5
+Rerunning explain analyze:
 ```
-# Query plan
-```
-Limit  (cost=9830.42..9830.43 rows=5 width=34) (actual time=24.886..24.887 rows=5 loops=1)
-  ->  Sort  (cost=9830.42..9830.43 rows=5 width=34) (actual time=24.884..24.885 rows=5 loops=1)
-        Sort Key: (random())
+Limit  (cost=143.34..143.35 rows=1 width=14) (actual time=0.389..0.393 rows=1 loops=1)
+  ->  Sort  (cost=143.34..143.39 rows=19 width=14) (actual time=0.386..0.388 rows=1 loops=1)
+        Sort Key: (count(*)) DESC
         Sort Method: top-N heapsort  Memory: 25kB
-        ->  Seq Scan on movies m  (cost=9603.35..9830.36 rows=5 width=34) (actual time=23.307..24.761 rows=12 loops=1)
-"              Filter: ((NOT (ANY (id = (hashed SubPlan 1).col1))) AND ((genre)::text = 'consumer'::text))"
-              Rows Removed by Filter: 9988
-              SubPlan 1
-                ->  Index Only Scan using movie_ratings_movie_id_user_id_key on movie_ratings  (cost=0.42..9603.30 rows=19 width=4) (actual time=0.625..22.887 rows=17 loops=1)
-                      Index Cond: (user_id = 1343)
-                      Heap Fetches: 0
-Planning Time: 0.968 ms
-Execution Time: 25.064 ms
+        ->  GroupAggregate  (cost=142.92..143.25 rows=19 width=14) (actual time=0.335..0.356 rows=17 loops=1)
+              Group Key: m.genre
+              ->  Sort  (cost=142.92..142.96 rows=19 width=6) (actual time=0.284..0.289 rows=17 loops=1)
+                    Sort Key: m.genre
+                    Sort Method: quicksort  Memory: 25kB
+                    ->  Nested Loop  (cost=0.71..142.51 rows=19 width=6) (actual time=0.068..0.234 rows=17 loops=1)
+                          ->  Index Scan using movie_ratings_user_idx on movie_ratings mr  (cost=0.42..8.76 rows=19 width=4) (actual time=0.046..0.061 rows=17 loops=1)
+                                Index Cond: (user_id = 1343)
+                          ->  Index Scan using movies_pkey on movies m  (cost=0.29..7.04 rows=1 width=10) (actual time=0.009..0.009 rows=1 loops=17)
+                                Index Cond: (id = mr.movie_id)
+Planning Time: 0.841 ms
+Execution Time: 0.495 ms
 ```
+This is a much faster time than we had before.
