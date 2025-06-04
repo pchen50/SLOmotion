@@ -41,7 +41,7 @@ class WatchedMovie(BaseModel):
 class AddToWatchlist(BaseModel):
     # ge = greater than or equal to
     # le = less than or equal to
-    rating: int | None = Field(
+    rating: float | None = Field(
         default=None, ge=1, le=10, description="Rating must be between 1 and 10."
     )
     notes: str | None = None
@@ -66,7 +66,7 @@ class WatchlistStats(BaseModel):
 
 class MovieRatingUpdate(BaseModel):
     notes: str | None = Field(None, example=None)
-    rating: int | None = None
+    rating: float | None = None
     status: Literal["watched", "want to watch", "watching"] | None = None
 
 

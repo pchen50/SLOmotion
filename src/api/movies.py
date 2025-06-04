@@ -14,7 +14,7 @@ router = APIRouter(
 
 class Rating(BaseModel):
     user_id: int
-    rating: int | None
+    rating: float | None
 
 
 class MovieId(BaseModel):
